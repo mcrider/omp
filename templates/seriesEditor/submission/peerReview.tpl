@@ -8,8 +8,23 @@
  *
  * $Id$
  *}
+ 
 <div id="submission">
 <h3>{translate key="manuscript.submission"}</h3>
+
+
+
+{assign var='randomId' value=1|rand:99999}
+<script type='text/javascript'>
+	{literal}
+	getAutocompleteSource("{/literal}{url op="getReviewerAutocomplete" monographId=$submission->getId()}{literal}", "{/literal}{$randomId}{literal}");
+	{/literal}
+</script>
+<input type="text" class="textField" id="sourceTitle-{$randomId}" name="reviewerSelectAutocomplete" value="" /> <br />
+<input type="hidden" id="sourceId-{$randomId}" name="reviewerSelectValue">
+
+
+
 
 <table width="100%" class="data">
 	<tr>
@@ -65,7 +80,7 @@
 			<form method="post" action="{url op="uploadReviewVersion"}" enctype="multipart/form-data">
 				{translate key="editor.monograph.uploadReviewVersion"}
 				<input type="hidden" name="monographId" value="{$submission->getId()}" />
-				{fbvFileInput id="upload" submit="submit"}
+				{** fbvFileInput id="upload" submit="submit" **}
 			</form>
 		</td>
 	</tr>

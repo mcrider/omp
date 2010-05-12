@@ -1826,6 +1826,45 @@ class SubmissionEditHandler extends SeriesEditorHandler {
 
 	}
 
+	/**
+	 * Get potential reviewers for editor's reviewer selection autocomplete.
+	 */
+	function getReviewerAutocomplete(&$args, &$request) {
+		$monographId = $request->getUserVar('monographId');
+		$press =& $request->getPress();
+		$seriesEditorSubmissionDAO =& DAORegistry::getDAO('SeriesEditorSubmissionDAO');
+
+		// Get items to populate possible items list with
+		$reviewers =& $seriesEditorSubmissionDAO->getReviewersNotAssignedToMonograph($press->getId(), $monographId);
+		$reviewers =& $reviewers->toArray();
+
+		$itemList = array();
+		foreach ($reviewers as $i => $reviewer) {
+			$itemList[] = array('id' => $reviewer->getId(),
+			 					'name' => $reviewer->getFullName(),
+			 					'abbrev' => $reviewer->getUsername()
+								);
+		}
+
+		import('lib.pkp.classes.core.JSON');
+		$sourceJson = new JSON('true', null, 'false', 'local');
+		$sourceContent = array();
+		foreach ($itemList as $i => $item) {
+			// The autocomplete code requires the JSON data to use 'label' as the array key for labels, and 'value' for the id
+			$additionalAttributes = array(
+				'label' =>  sprintf('%s (%s)', $item['name'], $item['abbrev']),
+				'value' => $item['id']
+			);
+			$itemJson = new JSON('true', '', 'false', null, $additionalAttributes);
+			$sourceContent[] = $itemJson->getString();
+
+			unset($itemJson);
+		}
+		$sourceJson->setContent('[' . implode(',', $sourceContent) . ']');
+
+		echo $sourceJson->getString();
+	}
+
 	//
 	// Validation
 	//

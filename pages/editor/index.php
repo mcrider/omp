@@ -71,6 +71,7 @@ switch ($op) {
 	case 'restoreToQueue':
 	case 'updateSeries':
 	case 'updateCommentsStatus':
+	case 'getReviewerAutocomplete':
 	//
 	// Layout Editing
 	//
