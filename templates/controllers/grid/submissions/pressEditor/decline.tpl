@@ -7,9 +7,9 @@
  * Form to decline the submission and send a message to the author
  *}
  
-<h4>{translate key="You are about to decline this submission"}</h4>
+<form name="declineForm-{$monographId}" id="declineForm-{$monographId}" action="{url component="grid.submissions.pressEditor.PressEditorSubmissionsListGridHandler" op="saveDecline" monographId=$monographId}" method="post">
+	<h4>{translate key="editor.monograph.decline"}</h4>
 
-<p>{translate key="Personal Message"}</p>
-{fbvFormSection title="Personal Message" for="personalMessage" float=$fbvStyles.float.LEFT}
-	{fbvElement type="textarea" id="personalMessage" size=$fbvStyles.size.SMALL measure=$fbvStyles.measure.3OF4}<br/>
-{/fbvFormSection}
+	<p>{translate key="common.personalMessage"}:</p>
+	{fbvElement type="textarea" id="personalMessage" size=$fbvStyles.size.MEDIUM}<br/>
+</form>

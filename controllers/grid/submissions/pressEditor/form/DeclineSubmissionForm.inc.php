@@ -1,176 +1,91 @@
 <?php
 
 /**
- * @file controllers/grid/users/submissionContributor/form/SubmissionContributorForm.inc.php
+ * @file controllers/grid/submissions/pressEditor/form/DeclineSubmissionForm.inc.php
  *
  * Copyright (c) 2003-2008 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
- * @class SubmissionContributorForm
- * @ingroup controllers_grid_submit_submissionContributor_form
+ * @class DeclineSubmissionForm
+ * @ingroup controllers_grid_submissions
  *
- * @brief Form for adding/editing a submissionContributor
+ * @brief Form for approving a submission
  */
 
 import('lib.pkp.classes.form.Form');
 
-class SubmissionContributorForm extends Form {
+class DeclineSubmissionForm extends Form {
 	/** The monograph associated with the submission contributor being edited **/
 	var $_monographId;
-
-	/** SubmissionContributor the submissionContributor being edited **/
-	var $_submissionContributor;
 
 	/**
 	 * Constructor.
 	 */
-	function SubmissionContributorForm($monographId, $submissionContributor) {
-		parent::Form('controllers/grid/users/submissionContributor/form/submissionContributorForm.tpl');
-		assert(is_numeric($monographId));
+	function DeclineSubmissionForm($monographId) {
+		parent::Form('controllers/grid/submissions/pressEditor/decline.tpl');
 		$this->_monographId = (int) $monographId;
 
-		//FIXME: Author?
-		//assert(!$submissionContributor || is_a($submissionContributor, 'Author'));
-		$this->_submissionContributor =& $submissionContributor;
-
-		// Validation checks for this form
-		$this->addCheck(new FormValidator($this, 'firstName', 'required', 'author.submit.form.authorRequiredFields'));
-		$this->addCheck(new FormValidator($this, 'lastName', 'required', 'author.submit.form.authorRequiredFields'));
-		$this->addCheck(new FormValidatorEmail($this, 'email', 'required', 'installer.form.emailRequired'));
-		$this->addCheck(new FormValidatorUrl($this, 'url', 'optional', 'user.profile.form.urlInvalid'));
 		$this->addCheck(new FormValidatorPost($this));
 	}
 
-	//
-	// Getters and Setters
-	//
-	/**
-	* Get the submissionContributor
-	* @return SubmissionContributor
-	*/
-	function &getSubmissionContributor() {
-		return $this->_submissionContributor;
-	}
-
-	/**
-	 * Get the MonographId
-	 * @return int monographId
-	 */
-	function getMonographId() {
-		return $this->_monographId;
-	}
 
 	//
 	// Template methods from Form
 	//
-	/**
-	* Initialize form data from the associated submissionContributor.
-	* @param $submissionContributor SubmissionContributor
-	*/
-	function initData() {
-		$submissionContributor =& $this->getSubmissionContributor();
-
-		if ( $submissionContributor ) {
-			$this->_data = array(
-				'authorId' => $submissionContributor->getId(),
-				'firstName' => $submissionContributor->getFirstName(),
-				'middleName' => $submissionContributor->getMiddleName(),
-				'lastName' => $submissionContributor->getLastName(),
-				'affiliation' => $submissionContributor->getAffiliation(),
-				'country' => $submissionContributor->getCountry(),
-				'email' => $submissionContributor->getEmail(),
-				'url' => $submissionContributor->getUrl(),
-				'userGroupId' => $submissionContributor->getUserGroupId(),
-				'biography' => $submissionContributor->getBiography(Locale::getLocale()),
-				'primaryContact' => $submissionContributor->getPrimaryContact()
-				);
-		}
-	}
 
 	/**
 	 * Display the form.
 	 */
-	function display($request) {
-		$submissionContributor =& $this->getSubmissionContributor();
-
+	function display(&$request, $fetch = true) {
 		$templateMgr =& TemplateManager::getManager();
-		$countryDao =& DAORegistry::getDAO('CountryDAO');
-		$countries =& $countryDao->getCountries();
-		$templateMgr->assign_by_ref('countries', $countries);
+		$templateMgr->assign('monographId', $this->_monographId);
 
-		$router =& $request->getRouter();
-		$context =& $router->getContext($request);
-
-		$userGroupDao =& DAORegistry::getDAO('UserGroupDAO');
-		$userGroups =& $userGroupDao->getByRoleId($context->getId(), ROLE_ID_AUTHOR);
-		$authorUserGroups = array();
-		while (!$userGroups->eof()) {
-			$userGroup =& $userGroups->next();
-			$authorUserGroups[$userGroup->getId()] = $userGroup->getLocalizedName();
-			unset($userGroup);
-		}
-		$templateMgr->assign_by_ref('authorUserGroups', $authorUserGroups);
-
-		$templateMgr->assign('monographId', $this->getMonographId());
-
-		parent::display($request);
+		return parent::display($request, $fetch);
 	}
 
 	/**
 	 * Assign form data to user-submitted data.
 	 */
 	function readInputData() {
-		$this->readUserVars(array('authorId',
-									'firstName',
-									'middleName',
-									'lastName',
-									'affiliation',
-									'country',
-									'email',
-									'url',
-									'userGroupId',
-									'biography',
-									'primaryContact'));
+		$this->readUserVars(array('personalMessage'));
 	}
 
 	/**
 	 * Save submissionContributor
 	 */
 	function execute() {
-		$authorDao =& DAORegistry::getDAO('AuthorDAO');
-		$monographId = $this->getMonographId();
+			// Fixme: How do we handle assigning other editors?
+		$user =& $request->getUser();
+		
+		// 1. Accept review
+		import('classes.submission.editor.EditorAction');
+		EditorAction::unsuitableSubmission($this->_monographId);
 
-		$submissionContributor =& $this->getSubmissionContributor();
-		if (!$submissionContributor) {
-			// this is a new submission contributor
-			$submissionContributor =& new Author();
-			$submissionContributor->setMonographId($monographId);
-			$existingSubmissionContributor = false;
-		} else {
-			$existingSubmissionContributor = true;
+		// FIXME: 2. Get selected files and put in DB somehow
+		
+		
+		// 3. Send Personal message to author
+		import('classes.mail.MonographMailTemplate');
+		$email = new MonographMailTemplate($editorSubmission, 'EDITOR_DECLINE');
+		if ($email->isEnabled()) {
+			$monographDao =& DAORegistry::getDAO('MonographDAO');
+			$monograph =& $monographDao->getMonograph($this->_monographId);
+			
+			$authorDao =& DAORegistry::getDAO('AuthorDAO');
+			$authors = $authorDao->getAuthorsByMonographId($this->_monographId);
+	
+			while($author =& $authors->next()) {
+				$email->addRecipient($author->getEmail(), $author->getFullName());
+				unset($author);
+			}			
+
+			$paramArray = array(
+				'authorName' => $monograph->getAuthorString(),
+				'personalNote' => $this->getData('personalNote'),
+				'editorialContactSignature' => $user->getContactSignature()
+			);
+			$email->send();
 		}
-
-		assert($monographId == $submissionContributor->getMonographId());
-
-		$submissionContributor->setFirstName($this->getData('firstName'));
-		$submissionContributor->setMiddleName($this->getData('middleName'));
-		$submissionContributor->setLastName($this->getData('lastName'));
-		$submissionContributor->setAffiliation($this->getData('affiliation'));
-		$submissionContributor->setCountry($this->getData('country'));
-		$submissionContributor->setEmail($this->getData('email'));
-		$submissionContributor->setUrl($this->getData('url'));
-		$submissionContributor->setUserGroupId($this->getData('userGroupId'));
-		$submissionContributor->setBiography($this->getData('biography'), Locale::getLocale()); // localized
-		$submissionContributor->setPrimaryContact(($this->getData('primaryContact') ? true : false));
-
-		if ($existingSubmissionContributor) {
-			$authorDao->updateAuthor($submissionContributor);
-			$authorId = $submissionContributor->getId();
-		} else {
-			$authorId = $authorDao->insertAuthor($submissionContributor);
-		}
-
-		return $authorId;
 	}
 }
 

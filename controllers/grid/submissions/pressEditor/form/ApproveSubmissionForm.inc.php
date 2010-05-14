@@ -53,11 +53,39 @@ class ApproveSubmissionForm extends Form {
 	/**
 	 * Save submissionContributor
 	 */
-	function execute() {
-		// TODO:
+	function execute(&$args, &$request) {
+		// Fixme: How do we handle assigning other editors?
+		$user =& $request->getUser();
+		
 		// 1. Accept review
-		// 2. Get selected files and put in DB somehow
+		import('classes.submission.editor.EditorAction');
+		EditorAction::assignEditor($this->_monographId, $user->getId());
+
+		// FIXME: 2. Get selected files and put in DB somehow
+		
+		
 		// 3. Send Personal message to author
+		import('classes.mail.MonographMailTemplate');
+		$email = new MonographMailTemplate($editorSubmission, 'EDITOR_APPROVE');
+		if ($email->isEnabled()) {
+			$monographDao =& DAORegistry::getDAO('MonographDAO');
+			$monograph =& $monographDao->getMonograph($this->_monographId);
+			
+			$authorDao =& DAORegistry::getDAO('AuthorDAO');
+			$authors = $authorDao->getAuthorsByMonographId($this->_monographId);
+	
+			while($author =& $authors->next()) {
+				$email->addRecipient($author->getEmail(), $author->getFullName());
+				unset($author);
+			}			
+
+			$paramArray = array(
+				'authorName' => $monograph->getAuthorString(),
+				'personalNote' => $this->getData('personalNote'),
+				'editorialContactSignature' => $user->getContactSignature()
+			);
+			$email->send();
+		}
 	}
 }
 

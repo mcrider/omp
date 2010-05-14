@@ -180,6 +180,26 @@ Thank you,
 {$editorialContactSignature}</body>
 		<description>This email notifies a Series Editor that the Editor has assigned them the task of overseeing a submission through the editing process. It provides information about the submission and how to access the press site.</description>
 	</email_text>
+	<email_text key="EDITOR_APPROVE">
+		<subject>Your submission has been approved</subject>
+		<body>{$authorName}:
+
+{$personalNote}
+
+Thank you,
+{$editorialContactSignature}</body>
+		<description>This email notifies an author that the editor has approved their submission and sent it to review.</description>
+	</email_text>
+	<email_text key="EDITOR_DECLINE">
+		<subject>Your submission has been declined</subject>
+		<body>{$authorName}:
+
+{$personalNote}
+
+Thank you,
+{$editorialContactSignature}</body>
+		<description>This email notifies an author that the editor has decline their submission.</description>
+	</email_text>
 	<email_text key="REVIEW_REQUEST">
 		<subject>Manuscript Review Request</subject>
 		<body>{$reviewerName}:

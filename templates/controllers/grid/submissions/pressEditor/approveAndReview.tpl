@@ -15,7 +15,6 @@
 	{load_url_in_div id="reviewFileSelection" url=$reviewFileSelectionGridUrl}
 	
 	<br />
-	{fbvFormSection title="common.personalMessage" for="personalMessage"}
-		{fbvElement type="textarea" id="personalMessage" size=$fbvStyles.size.MEDIUM}<br/>
-	{/fbvFormSection}
+	<p>{translate key="common.personalMessage"}:</p>
+	{fbvElement type="textarea" id="personalMessage" size=$fbvStyles.size.MEDIUM}<br/>
 </form>

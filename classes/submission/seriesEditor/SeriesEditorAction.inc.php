@@ -613,39 +613,13 @@ class SeriesEditorAction extends Action {
 	 * @param $seriesEditorSubmission object
 	 * @return boolean true iff ready for redirect
 	 */
-	function unsuitableSubmission($seriesEditorSubmission, $send = false) {
-		$seriesEditorSubmissionDao =& DAORegistry::getDAO('SeriesEditorSubmissionDAO');
+	function unsuitableSubmission($seriesEditorSubmission) {
 		$userDao =& DAORegistry::getDAO('UserDAO');
-
-		$press =& Request::getPress();
-		$user =& Request::getUser();
 
 		$author =& $userDao->getUser($seriesEditorSubmission->getUserId());
 		if (!isset($author)) return true;
 
-		import('classes.mail.MonographMailTemplate');
-		$email = new MonographMailTemplate($seriesEditorSubmission, 'SUBMISSION_UNSUITABLE');
-
-		if (!$email->isEnabled() || ($send && !$email->hasErrors())) {
-			HookRegistry::call('SeriesEditorAction::unsuitableSubmission', array(&$seriesEditorSubmission, &$author, &$email));
-			if ($email->isEnabled()) {
-				$email->setAssoc(MONOGRAPH_EMAIL_EDITOR_NOTIFY_AUTHOR_UNSUITABLE, MONOGRAPH_EMAIL_TYPE_EDITOR, $user->getId());
-				$email->send();
-			}
-			SeriesEditorAction::archiveSubmission($seriesEditorSubmission);
-			return true;
-		} else {
-			if (!Request::getUserVar('continued')) {
-				$paramArray = array(
-					'editorialContactSignature' => $user->getContactSignature(),
-					'authorName' => $author->getFullName()
-				);
-				$email->assignParams($paramArray);
-				$email->addRecipient($author->getEmail(), $author->getFullName());
-			}
-			$email->displayEditForm(Request::url(null, null, 'unsuitableSubmission'), array('monographId' => $seriesEditorSubmission->getId()));
-			return false;
-		}
+		SeriesEditorAction::archiveSubmission($seriesEditorSubmission);
 	}
 
 	/**

@@ -28,7 +28,7 @@ class EditorAction extends SeriesEditorAction {
 	 * @param $seriesEditorId int
 	 * @return boolean true iff ready for redirect
 	 */
-	function assignEditor($monographId, $seriesEditorId, $isEditor = false, $send = false) {
+	function assignEditor($monographId, $seriesEditorId, $isEditor = false) {
 		$editorSubmissionDao =& DAORegistry::getDAO('EditorSubmissionDAO');
 		$editAssignmentDao =& DAORegistry::getDAO('EditAssignmentDAO');
 		$userDao =& DAORegistry::getDAO('UserDAO');
@@ -40,16 +40,7 @@ class EditorAction extends SeriesEditorAction {
 		$seriesEditor =& $userDao->getUser($seriesEditorId);
 		if (!isset($seriesEditor)) return true;
 
-		import('classes.mail.MonographMailTemplate');
-		$email = new MonographMailTemplate($editorSubmission, 'EDITOR_ASSIGN');
-
-		if ($user->getId() === $seriesEditorId || !$email->isEnabled() || ($send && !$email->hasErrors())) {
-			HookRegistry::call('EditorAction::assignEditor', array(&$editorSubmission, &$seriesEditor, &$isEditor, &$email));
-			if ($email->isEnabled() && $user->getId() !== $seriesEditorId) {
-				$email->setAssoc(MONOGRAPH_EMAIL_EDITOR_ASSIGN, MONOGRAPH_EMAIL_TYPE_EDITOR, $seriesEditor->getId());
-				$email->send();
-			}
-
+		if ($user->getId() === $seriesEditorId) {
 			$editAssignment = new EditAssignment();
 			$editAssignment->setMonographId($monographId);
 			$editAssignment->setCanEdit(1);
@@ -71,22 +62,7 @@ class EditorAction extends SeriesEditorAction {
 			import('classes.monograph.log.MonographEventLogEntry');
 			MonographLog::logEvent($monographId, MONOGRAPH_LOG_EDITOR_ASSIGN, MONOGRAPH_LOG_TYPE_EDITOR, $seriesEditorId, 'log.editor.editorAssigned', array('editorName' => $seriesEditor->getFullName(), 'monographId' => $monographId));
 			return true;
-		} else {
-			if (!Request::getUserVar('continued')) {
-				$email->addRecipient($seriesEditor->getEmail(), $seriesEditor->getFullName());
-				$paramArray = array(
-					'editorialContactName' => $seriesEditor->getFullName(),
-					'editorUsername' => $seriesEditor->getUsername(),
-					'editorPassword' => $seriesEditor->getPassword(),
-					'editorialContactSignature' => $user->getContactSignature(),
-					'submissionUrl' => Request::url(null, $isEditor?'editor':'seriesEditor', 'submissionReview', $monographId),
-					'submissionEditingUrl' => Request::url(null, $isEditor?'editor':'seriesEditor', 'submissionReview', $monographId)
-				);
-				$email->assignParams($paramArray);
-			}
-			$email->displayEditForm(Request::url(null, null, 'assignEditor', 'send'), array('monographId' => $monographId, 'editorId' => $seriesEditorId));
-			return false;
-		}
+		} 
 	}
 
 }
