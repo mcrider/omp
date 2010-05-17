@@ -31,6 +31,37 @@ class SubmissionsListGridCellProvider extends DataObjectGridCellProvider {
 	function getCellState(&$row, &$column) {
 		return '';
 	}
+	
+	/**
+	 * Get cell actions associated with this row/column combination
+	 * @param $row GridRow
+	 * @param $column GridColumn
+	 * @return array an array of GridAction instances
+	 */
+	function getCellActions(&$request, &$row, &$column, $position = GRID_ACTION_POSITION_DEFAULT) {
+		$monograph =& $row->getData();
+		$router =& $request->getRouter();
+		$actionArgs = array(
+			'gridId' => $row->getGridId(),
+			'monographId' => $monograph->getId(),
+			'reviewType' => $monograph->getCurrentReviewType(),
+			'round' => $monograph->getCurrentRound()
+		);
+
+		if($column->getId() == 'title') {
+			$action =& new GridAction(
+				'submissionInfo',
+				GRID_ACTION_MODE_MODAL,
+				GRID_ACTION_TYPE_NOTHING,
+				$router->url($request, null, null, 'getSubmissionInformation', null, $actionArgs),
+				$monograph->getLocalizedTitle()
+			);
+			return array($action);
+		}
+
+		return array();
+		
+	}
 
 	//
 	// Template methods from GridCellProvider
@@ -47,11 +78,6 @@ class SubmissionsListGridCellProvider extends DataObjectGridCellProvider {
 		$columnId = $column->getId();
 		assert(is_a($element, 'DataObject') && !empty($columnId));
 		switch ($columnId) {
-			case 'title':
-				$title = $element->getLocalizedTitle();
-				if ( empty($title) ) $title = Locale::translate('common.untitled');
-				return array('label' => $title);
-				break;
 			case 'dateAssigned':
 				$dateAssigned = $element->getDateAssigned();
 				if ( empty($dateAssigned) ) $dateAssigned = '--';

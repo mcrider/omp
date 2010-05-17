@@ -36,7 +36,13 @@ class SubmissionsListGridHandler extends GridHandler {
 	//
 	// Getters/Setters
 	//
-
+	/**
+	 * @see PKPHandler::getRemoteOperations()
+	 * @return array
+	 */
+	function getRemoteOperations() {
+		return array_merge(parent::getRemoteOperations(), array('getSubmissionInformation'));
+	}
 	//
 	// Overridden methods from PKPHandler
 	//
@@ -72,12 +78,15 @@ class SubmissionsListGridHandler extends GridHandler {
 				'title',
 				'common.title',
 				null,
-				'controllers/grid/gridCell.tpl',
+				'controllers/grid/gridLinkedCell.tpl',
 				$cellProvider
 			)
 		);
 	}
 
+function getSubmissionInformation(&$args, &$request) {
+	
+}
 	//
 	// Private helper functions
 	//

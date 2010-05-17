@@ -73,6 +73,7 @@ class PressEditorSubmissionsListGridCellProvider extends SubmissionsListGridCell
 			'reviewType' => $monograph->getCurrentReviewType(),
 			'round' => $monograph->getCurrentRound()
 		);
+		
 
 		switch ($state) {
 			case 'new':
@@ -90,7 +91,7 @@ class PressEditorSubmissionsListGridCellProvider extends SubmissionsListGridCell
 				break;
 		}
 
-		return array();
+		return parent::getCellActions($request, $row, $column, $position);
 	}
 
 	//
