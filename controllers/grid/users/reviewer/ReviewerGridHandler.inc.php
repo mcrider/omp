@@ -39,7 +39,7 @@ class ReviewerGridHandler extends GridHandler {
 	 * @return array
 	 */
 	function getRemoteOperations() {
-		return array_merge(parent::getRemoteOperations(), array('addReviewer', 'editReviewer', 'updateReviewer', 'deleteReviewer'));
+		return array_merge(parent::getRemoteOperations(), array('addReviewer', 'editReviewer', 'updateReviewer', 'deleteReviewer', 'getReviewerAutocomplete'));
 	}
 
 	/**
@@ -93,7 +93,7 @@ class ReviewerGridHandler extends GridHandler {
 
 		// Get the monograph
 		$submission =& $this->getSubmission();
-		assert(is_a($monograph, 'Monograph'));
+		assert(is_a($submission, 'Monograph'));
 		$monographId = $submission->getId();
 
 		// Get the review round currently being looked at
@@ -181,7 +181,7 @@ class ReviewerGridHandler extends GridHandler {
 	function addReviewer(&$args, &$request) {
 		// Calling editReviewer() with an empty row id will add
 		// a new reviewer.
-		$this->editReviewer($args, $request);
+		return $this->editReviewer($args, $request);
 	}
 
 	/**
@@ -194,18 +194,54 @@ class ReviewerGridHandler extends GridHandler {
 		$monographId = $request->getUserVar('monographId');
 		// Identify the reviewer to be updated
 		$reviewerId = $request->getUserVar('reviewerId');
-		//$reviewer =& $this->_getReviewerFromArgs($args);
-		$authorDao =& DAORegistry::getDAO('AuthorDAO');
-		$reviewer = $authorDao->getAuthor($reviewerId);
 
 		// Form handling
 		import('controllers.grid.users.reviewer.form.ReviewerForm');
-		$reviewerForm = new ReviewerForm($monographId, $reviewer);
+		$reviewerForm = new ReviewerForm($monographId, $reviewerId);
 		$reviewerForm->initData();
 		$reviewerForm->display($request);
+		
+		$json = new JSON('true', $reviewerForm->fetch($request));
+		return $json->getString();
+	}
 
-		// The form has already been displayed.
-		return '';
+	/**
+	* Get potential reviewers for editor's reviewer selection autocomplete.
+	*/
+	function getReviewerAutocomplete(&$args, &$request) {
+		$monographId = $request->getUserVar('monographId');
+		$press =& $request->getPress();
+		$seriesEditorSubmissionDAO =& DAORegistry::getDAO('SeriesEditorSubmissionDAO');
+		
+		// Get items to populate possible items list with
+		$reviewers =& $seriesEditorSubmissionDAO->getReviewersNotAssignedToMonograph($press->getId(), $monographId);
+		$reviewers =& $reviewers->toArray();
+		
+		$itemList = array();
+		foreach ($reviewers as $i => $reviewer) {
+			$itemList[] = array('id' => $reviewer->getId(),
+								 'name' => $reviewer->getFullName(),
+								 'abbrev' => $reviewer->getUsername()
+								);
+		}
+		
+		import('lib.pkp.classes.core.JSON');
+		$sourceJson = new JSON('true', null, 'false', 'local');
+		$sourceContent = array();
+		foreach ($itemList as $i => $item) {
+			// The autocomplete code requires the JSON data to use 'label' as the array key for labels, and 'value' for the id
+			$additionalAttributes = array(
+				'label' =>  sprintf('%s (%s)', $item['name'], $item['abbrev']),
+				'value' => $item['id']
+		   );
+			$itemJson = new JSON('true', '', 'false', null, $additionalAttributes);
+			$sourceContent[] = $itemJson->getString();
+		
+			unset($itemJson);
+		}
+		$sourceJson->setContent('[' . implode(',', $sourceContent) . ']');
+		
+		echo $sourceJson->getString();
 	}
 
 	/**
