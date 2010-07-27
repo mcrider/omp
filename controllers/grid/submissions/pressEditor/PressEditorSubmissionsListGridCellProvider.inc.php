@@ -85,13 +85,12 @@ class PressEditorSubmissionsListGridCellProvider extends SubmissionsListGridCell
 
 		switch ($state) {
 			case 'new':
-				$actionArgs['decision'] = SUBMISSION_EDITOR_DECISION_ACCEPT;
 				$action =& 	new LinkAction(
 					'accept',
 					LINK_ACTION_MODE_MODAL,
 					null,
-					$router->url($request, null, 'modals.editorDecision.EditorDecisionHandler', 'newReviewRound', null, $actionArgs),
-					'editor.monograph.newRound',
+					$router->url($request, null, 'modals.editorDecision.EditorDecisionHandler', 'initiateReview', null, $actionArgs),
+					'editor.monograph.initiateReview',
 					null,
 					$state
 					);
