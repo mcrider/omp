@@ -86,6 +86,7 @@ class InitiateReviewForm extends Form {
 
 		// 2. Create a new internal review round
 		// FIXME: what do do about reviewRevision? being set to 1 for now.
+		$reviewRoundDao =& DAORegistry::getDAO('ReviewRoundDAO');
 		$reviewRoundDao->createReviewRound($this->_monographId, REVIEW_TYPE_INTERNAL, 1, 1, REVIEW_ROUND_STATUS_PENDING_REVIEWERS);
 
 		// 3. Assign the editor
