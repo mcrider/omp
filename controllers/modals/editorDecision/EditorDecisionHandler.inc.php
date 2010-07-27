@@ -130,7 +130,11 @@ class EditorDecisionHandler extends Handler {
 		if ($initiateReviewForm->validate()) {
 			$initiateReviewForm->execute($args, $request);
 
-			$json = new JSON('true');
+			$router =& $request->getRouter();
+			$dispatcher =& $router->getDispatcher();
+
+			$additionalAttributes = array('script' => "$(window.location).attr('href', '". $dispatcher->url($request, ROUTE_PAGE, null, 'workflow', 'review', array($monographId)) . "');");
+			$json = new JSON('true', null, true, null, $additionalAttributes);
 		} else {
 			$json = new JSON('false');
 		}
