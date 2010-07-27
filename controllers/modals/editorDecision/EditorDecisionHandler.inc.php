@@ -128,7 +128,7 @@ class EditorDecisionHandler extends Handler {
 
 		$initiateReviewForm->readInputData();
 		if ($initiateReviewForm->validate()) {
-			$round = $initiateReviewForm->execute($args, $request);
+			$initiateReviewForm->execute($args, $request);
 
 			$json = new JSON('true');
 		} else {
