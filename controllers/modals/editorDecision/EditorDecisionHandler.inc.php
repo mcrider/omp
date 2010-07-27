@@ -105,11 +105,11 @@ class EditorDecisionHandler extends Handler {
 		$monographId = $request->getUserVar('monographId');
 
 		// Form handling
-		import('controllers.modals.editorDecision.form.NewReviewRoundForm');
-		$newReviewRoundForm = new NewReviewRoundForm($monographId);
-		$newReviewRoundForm->initData($args, $request);
+		import('controllers.modals.editorDecision.form.InitiateReviewForm');
+		$initiateReviewForm = new InitiateReviewForm($monographId);
+		$initiateReviewForm->initData($args, $request);
 
-		$json = new JSON('true', $newReviewRoundForm->fetch($request));
+		$json = new JSON('true', $initiateReviewForm->fetch($request));
 		return $json->getString();
 	}
 
@@ -123,7 +123,7 @@ class EditorDecisionHandler extends Handler {
 		Locale::requireComponents(array(LOCALE_COMPONENT_APPLICATION_COMMON));
 
 		// Form handling
-		import('controllers.modals.editorDecision.form.NewReviewRoundForm');
+		import('controllers.modals.editorDecision.form.InitiateReviewForm');
 		$initiateReviewForm = new InitiateReviewForm($monographId);
 
 		$initiateReviewForm->readInputData();
