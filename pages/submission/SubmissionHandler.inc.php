@@ -13,7 +13,6 @@
  */
 
 
-import('classes.submission.author.AuthorAction');
 import('classes.handler.Handler');
 
 class SubmissionHandler extends Handler {
@@ -29,13 +28,14 @@ class SubmissionHandler extends Handler {
 
 	/**
 	 * Display monograph author index page.
+ 	 * @param $args array
+	 * @param $request PKPRequest
 	 */
-	function index($args) {
+	function index(&$args, &$request) {
 		$templateMgr =& TemplateManager::getManager();
-		$this->validate();
 		$this->setupTemplate();
 
-		$press =& Request::getPress();
+		$press =& $request->getPress();
 
 		$user =& Request::getUser();
 		$rangeInfo =& Handler::getRangeInfo('submissions');
@@ -61,7 +61,30 @@ class SubmissionHandler extends Handler {
 		}
 		$templateMgr->assign_by_ref('submissions', $submissions);
 
- 		$templateMgr->display('author/index.tpl');
+ 		$templateMgr->display('submission/index.tpl');
+	}
+
+	/**
+	 * Enter description here ...
+	 * @param $args array
+	 * @param $request PKPRequest
+	 */
+	function details(&$args, &$request) {
+		$monographId = array_shift($args);
+
+		$monographDao =& DAORegistry::getDAO('MonographDAO');
+		$monograph =& $monographDao->getMonograph($monographId);
+
+		$this->setupTemplate();
+
+		$user =& Request::getUser();
+		$rangeInfo =& Handler::getRangeInfo('submissions');
+		$authorSubmissionDao =& DAORegistry::getDAO('AuthorSubmissionDAO');
+
+		$templateMgr =& TemplateManager::getManager();
+		$templateMgr->assign_by_ref('monograph', $monograph);
+
+ 		$templateMgr->display('submission/details.tpl');
 	}
 
 	/**

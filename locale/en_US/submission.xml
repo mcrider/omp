@@ -131,4 +131,9 @@
 	<message key="submission.submit.newFile">Upload Another File For This Submission</message>
 	<message key="submission.submit.finishedUploading">Uploading Complete</message>
 	<message key="submission.submit.currentContributors">Current Contributors</message>
+
+	<message key="submission.upload.possibleRevision">Possible Revision Detected</message>
+	<message key="submission.upload.possibleRevisionDescription">It looks like you may be trying to upload a revision to an existing file. Is this the case?</message>
+	<message key="submission.upload.possibleRevisionConfirm">Yes, this is a revision</message>
+	<message key="submission.upload.possibleRevisionDeny">No, this is a new file</message>
 </locale>

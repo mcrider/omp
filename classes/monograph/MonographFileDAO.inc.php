@@ -398,6 +398,18 @@ class MonographFileDAO extends DAO {
 	}
 
 	/**
+	 * Set a file as the latest revision of an existing file
+	 * @param $newFileId int
+	 * @param $oldFileId int
+	 */
+	function setAsLatestRevision($newFileId, $oldFileId) {
+		$revision = $this->getRevisionNumber($oldFileId) +1;
+		return $this->update(
+			'UPDATE monograph_files SET file_id = ?, revision = ? WHERE file_id = ?', array($oldFileId, $revision, $newFileId)
+		);
+	}
+
+	/**
 	 * Delete a monograph file.
 	 * @param $monograph MonographFile
 	 */

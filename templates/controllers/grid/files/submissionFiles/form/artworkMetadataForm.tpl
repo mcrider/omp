@@ -1,5 +1,5 @@
 {**
- * fileInfo.tpl
+ * artworkMetadataForm.tpl
  *
  * Copyright (c) 2003-2010 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
@@ -173,8 +173,8 @@
 
 {fbvFormArea id="buttons"}
 	{fbvFormSection}
-		{fbvButton id="cancelButton2-$fileId" label="common.cancel" float=$fbvStyles.float.LEFT}
-		{fbvButton id="continueButton2-$fileId" label="common.continue" float=$fbvStyles.float.RIGHT}
+		{fbvLink id="cancelButton2-$fileId" label="common.cancel"}
+		{fbvButton id="continueButton2-$fileId" label="common.continue" align=$fbvStyles.align.RIGHT}
 	{/fbvFormSection}
 {/fbvFormArea}
 

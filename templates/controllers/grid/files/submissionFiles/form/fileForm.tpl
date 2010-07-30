@@ -37,14 +37,40 @@
 		    		$('#deleteUrl').val(returnString.deleteUrl);
 		  			$('#continueButton-{/literal}{$fileId}{literal}').button( "option", "disabled", false );
 		    		$('#fileUploadTabs-{/literal}{$fileId}{literal}').tabs('enable', 1);
-	    		}
+
+		    		// If the file name is similar to an existing filename, show the possible revision control
+		    		if(returnString.possibleRevision == true) {
+		    			$('#confirmUrl').val(returnString.revisionConfirmUrl);
+		    			$('#possibleRevision-{/literal}{$randomId}{literal}').show('slide');
+		    		}
+				}
 	    		$('#loadingText-{/literal}{$randomId}{literal}').text(returnString.content);  // Set to error or success message
 	        }
 	    });
 
+		// Set 'confirm revision' button behavior
+		$("#confirmRevision-{/literal}{$randomId}{literal}").click(function() {
+			confirmUrl = $('#confirmUrl').val();
+			if(confirmUrl != "") {
+				$.getJSON(confirmUrl, function(jsonData) {
+					if (jsonData.status === true) {
+						$("#possibleRevision-{/literal}{$randomId}{literal}").hide();
+						$('#fileUploadTabs-{/literal}{$fileId}{literal}').tabs('url', 0, jsonData.fileFormUrl);
+						$('#fileUploadTabs-{/literal}{$fileId}{literal}').tabs('url', 1, jsonData.metadataUrl);
+			    		$('#deleteUrl').val(jsonData.deleteUrl);
+					}
+				});
+			}
+			return false;
+		});
+		$("#denyRevision-{/literal}{$randomId}{literal}").click(function() {
+			$("#possibleRevision-{/literal}{$randomId}{literal}").hide();
+		});
+
 		// Set cancel/continue button behaviors
 		$("#continueButton-{/literal}{$fileId}{literal}").click(function() {
 			$('#fileUploadTabs-{/literal}{$fileId}{literal}').tabs('select', 1);
+			return false;
 		});
 		$("#cancelButton-{/literal}{$fileId}{literal}").click(function() {
 			// User has uploaded a file then pressed cancel--delete the file
@@ -54,7 +80,10 @@
 			}
 
 			$('#fileUploadTabs-{/literal}{$fileId}{literal}').parent().dialog('close');
+			return false;
 		});
+
+
 	});
 	{/literal}
 </script>
@@ -83,12 +112,28 @@
 		<div id='loading' class='throbber' style='margin: 0px;' ></div>
 		<ul><li id='loadingText-{$randomId}' style='display:none;'>{translate key='submission.loadMessage'}</li></ul>
 	</div>
+
+	<div id="possibleRevision-{$randomId}" class="possibleRevision response" style="display: none;">
+		<div id="revisionWarningIcon" class="warning"></div>
+		<div id="revisionWarningText">
+			<h5>{translate key="submission.upload.possibleRevision"}</h5>
+			<p>{translate key="submission.upload.possibleRevisionDescription"}</p>
+			<span><a href="#" id="confirmRevision-{$randomId}">{translate key="submission.upload.possibleRevisionConfirm"}</a></span>
+			<span><a href="#" id="denyRevision-{$randomId}">{translate key="submission.upload.possibleRevisionDeny"}</a></span>
+		</div>
+	</div>
+
 	<div class="separator"></div>
+
 	{fbvFormArea id="buttons"}
-		{fbvFormSection}
-			{fbvButton id="cancelButton-$fileId" label="common.cancel" float=$fbvStyles.float.LEFT}
-			{if !$fileId}{assign var="buttonDisabled" value="disabled"}{/if}
-			{fbvButton id="continueButton-$fileId" label="common.continue" disabled=$buttonDisabled float=$fbvStyles.float.RIGHT}
-		{/fbvFormSection}
+	    {fbvFormSection}
+	        {fbvLink id="cancelButton-$fileId" label="common.cancel"}
+	        {if !$fileId}{assign var="buttonDisabled" value="disabled"}{/if}
+	        {fbvButton id="continueButton-$fileId" label="common.continue" disabled=$buttonDisabled align=$fbvStyles.align.RIGHT}
+	    {/fbvFormSection}
 	{/fbvFormArea}
+
+	<!--  After file is uploaded, store URLs to handler actions in these fields -->
+	<input type="hidden" id="deleteUrl" name="deleteUrl" value="" />
+	<input type="hidden" id="confirmUrl" name="confirmUrl" value="" />
 </form>
