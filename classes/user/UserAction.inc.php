@@ -44,12 +44,12 @@ class UserAction {
 			unset($monograph);
 		}
 
-		$editAssignmentDao =& DAORegistry::getDAO('EditAssignmentDAO');
-		$editAssignments =& $editAssignmentDao->getByUserId($oldUserId);
-		while ($editAssignment =& $editAssignments->next()) {
-			$editAssignment->setEditorId($newUserId);
-			$editAssignmentDao->updateEditAssignment($editAssignment);
-			unset($editAssignment);
+		$monographStageAssignmentDao =& DAORegistry::getDAO('MonographStageAssignmentDAO');
+		$monographStageAssignments =& $monographStageAssignmentDao->getByUserId($oldUserId);
+		while ($monographStageAssignment =& $monographStageAssignments->next()) {
+			$monographStageAssignment->setUserId($newUserId);
+			$monographStageAssignmentDao->updateObject($monographStageAssignment);
+			unset($monographStageAssignment);
 		}
 
 		$editorSubmissionDao =& DAORegistry::getDAO('EditorSubmissionDAO');

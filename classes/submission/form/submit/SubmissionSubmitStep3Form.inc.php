@@ -131,6 +131,17 @@ class SubmissionSubmitStep3Form extends SubmissionSubmitForm {
 			$monograph->setSubmissionProgress(0);
 		}
 
+		// Assign the submitter to all workflow stages
+		$monographStageAssignmentDao =& DAORegistry::getDAO('MonographStageAssignmentDAO');
+		$userGroupDao =& DAORegistry::getDAO('UserGroupDAO');
+
+		$authorUserGroup =& $userGroupDao->getDefaultByRoleId($monograph->getPressId(), ROLE_ID_AUTHOR);
+		$stageIds = array(WORKFLOW_STAGE_ID_SUBMISSION, WORKFLOW_STAGE_ID_INTERNAL_REVIEW, WORKFLOW_STAGE_ID_EXTERNAL_REVIEW, WORKFLOW_STAGE_ID_EDITING, WORKFLOW_STAGE_ID_PRODUCTION);
+
+		foreach ($stageIds as $stageId) {
+			$monographStageAssignmentDao->assignUserToStage($monograph->getId(), $stageId, $monograph->getUserId(), $authorUserGroup->getId());
+		}
+
 		// Save the monograph
 		$monographDao->updateMonograph($monograph);
 

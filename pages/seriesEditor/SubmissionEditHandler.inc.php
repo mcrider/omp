@@ -61,8 +61,8 @@ class SubmissionEditHandler extends SeriesEditorHandler {
 
 		$templateMgr =& TemplateManager::getManager();
 		$templateMgr->assign_by_ref('submission', $submission);
-		$editAssignmentDao =& DAORegistry::getDAO('EditAssignmentDAO');
-		$editAssignments =& $editAssignmentDao->getByMonographId($monographId);
+		$monographStageAssignmentDao =& DAORegistry::getDAO('MonographStageAssignmentDAO');
+		$monographStageAssignments =& $monographStageAssignmentDao->getByMonographId($monographId);
 		$templateMgr->assign_by_ref('editAssignments', $editAssignments);
 		$templateMgr->assign_by_ref('series', $series);
 		$templateMgr->assign_by_ref('submissionFile', $submission->getSubmissionFile());
@@ -1900,16 +1900,6 @@ class SubmissionEditHandler extends SeriesEditorHandler {
 
 		if (!$isValid) {
 			Request::redirect(null, Request::getRequestedPage());
-		}
-
-		// If necessary, note the current date and time as the "underway" date/time
-		$editAssignmentDao =& DAORegistry::getDAO('EditAssignmentDAO');
-		$editAssignments =& $seriesEditorSubmission->getEditAssignments();
-		foreach ($editAssignments as $editAssignment) {
-			if ($editAssignment->getEditorId() == $user->getId() && $editAssignment->getDateUnderway() === null) {
-				$editAssignment->setDateUnderway(Core::getCurrentDate());
-				$editAssignmentDao->updateEditAssignment($editAssignment);
-			}
 		}
 
 		$this->submission =& $seriesEditorSubmission;

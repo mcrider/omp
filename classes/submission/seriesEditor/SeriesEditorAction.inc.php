@@ -49,9 +49,9 @@ class SeriesEditorAction extends Action {
 	 * @param $decision int
 	 */
 	function recordDecision($seriesEditorSubmission, $decision) {
-		$editAssignmentDao =& DAORegistry::getDAO('EditAssignmentDAO');
-		$editAssignments =& $editAssignmentDao->getByMonographId($seriesEditorSubmission->getId());
-		if (empty($editAssignments)) return;
+		$monographStageAssignmentDao =& DAORegistry::getDAO('MonographStageAssignmentDAO');
+		$monographStageAssignments =& $monographStageAssignmentDao->getByMonographId($seriesEditorSubmission->getId());
+		if (empty($monographStageAssignments)) return;
 
 		$seriesEditorSubmissionDao =& DAORegistry::getDAO('SeriesEditorSubmissionDAO');
 		$user =& Request::getUser();

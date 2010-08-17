@@ -23,7 +23,7 @@ class ReviewerSubmissionDAO extends DAO {
 	var $authorDao;
 	var $userDao;
 	var $reviewAssignmentDao;
-	var $editAssignmentDao;
+	var $monographStageAssignmentDao;
 	var $monographFileDao;
 	var $monographCommentDao;
 
@@ -36,7 +36,7 @@ class ReviewerSubmissionDAO extends DAO {
 		$this->authorDao =& DAORegistry::getDAO('AuthorDAO');
 		$this->userDao =& DAORegistry::getDAO('UserDAO');
 		$this->reviewAssignmentDao =& DAORegistry::getDAO('ReviewAssignmentDAO');
-		$this->editAssignmentDao =& DAORegistry::getDAO('EditAssignmentDAO');
+		$this->monographStageAssignmentDao =& DAORegistry::getDAO('MonographStageAssignmentDAO');
 		$this->monographFileDao =& DAORegistry::getDAO('MonographFileDAO');
 		$this->monographCommentDao =& DAORegistry::getDAO('MonographCommentDAO');
 	}
@@ -108,6 +108,7 @@ class ReviewerSubmissionDAO extends DAO {
 		$reviewerSubmission = $this->newDataObject();
 
 		// Editor Assignment
+		// FIXME #5557: Ensure compatibility with monograph stage assignment DAO
 		$editAssignments =& $this->editAssignmentDao->getByMonographId($row['monograph_id']);
 		$reviewerSubmission->setEditAssignments($editAssignments->toArray());
 

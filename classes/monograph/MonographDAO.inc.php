@@ -303,8 +303,8 @@ class MonographDAO extends DAO {
 		$reviewAssignmentDao =& DAORegistry::getDAO('ReviewAssignmentDAO');
 		$reviewAssignmentDao->deleteByMonographId($monographId);
 
-		$editAssignmentDao =& DAORegistry::getDAO('EditAssignmentDAO');
-		$editAssignmentDao->deleteByMonographId($monographId);
+		$monographStageAssignmentDao =& DAORegistry::getDAO('MonographStageAssignmentDAO');
+		$monographStageAssignmentDao->deleteByMonographId($monographId);
 
 		$monographCommentDao =& DAORegistry::getDAO('MonographCommentDAO');
 		$monographCommentDao->deleteMonographComments($monographId);

@@ -30,7 +30,7 @@ class EditorAction extends SeriesEditorAction {
 	 */
 	function assignEditor($monographId, $seriesEditorId, $isEditor = false, $send = false) {
 		$editorSubmissionDao =& DAORegistry::getDAO('EditorSubmissionDAO');
-		$editAssignmentDao =& DAORegistry::getDAO('EditAssignmentDAO');
+		$monographStageAssignmentDao =& DAORegistry::getDAO('MonographStageAssignmentDAO');
 		$userDao =& DAORegistry::getDAO('UserDAO');
 
 		$user =& Request::getUser();

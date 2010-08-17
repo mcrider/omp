@@ -155,65 +155,66 @@ class MonographMailTemplate extends MailTemplate {
 		}
 	}
 
+	function toAssignedEditors($monographId) {
+		$userGroupDao =& DAORegistry::getDAO('UserGroupDAO');
+		$userGroupId = $userGroupDao->getByRoleId($this->press->getId(), ROLE_ID_EDITOR);
+
+		$returner = array();
+		$monographStageAssignmentDao =& DAORegistry::getDAO('MonographStageAssignmentDAO');
+		$monographStageAssignments =& $monographStageAssignmentDao->getUsersByMonographId($monographId, null, $userGroupId);
+		while ($monographStageAssignment =& $monographStageAssignments->next()) {
+			$this->addRecipient($monographStageAssignment->getEmail(), $monographStageAssignment->getFullName());
+			$returner[] =& $monographStageAssignment;
+			unset($monographStageAssignment);
+		}
+		return $returner;
+	}
+
 	function ccAssignedEditors($monographId) {
+		$userGroupDao =& DAORegistry::getDAO('UserGroupDAO');
+		$userGroupId = $userGroupDao->getByRoleId($this->press->getId(), ROLE_ID_EDITOR);
+
 		$returner = array();
-		$editAssignmentDao =& DAORegistry::getDAO('EditAssignmentDAO');
-		$editAssignments =& $editAssignmentDao->getEditorAssignmentsByMonographId($monographId);
-		while ($editAssignment =& $editAssignments->next()) {
-			$this->addCc($editAssignment->getEditorEmail(), $editAssignment->getEditorFullName());
-			$returner[] =& $editAssignment;
-			unset($editAssignment);
+		$monographStageAssignmentDao =& DAORegistry::getDAO('MonographStageAssignmentDAO');
+		$monographStageAssignments =& $monographStageAssignmentDao->getUsersByMonographId($monographId, null, $userGroupId);
+		while ($monographStageAssignment =& $monographStageAssignments->next()) {
+			$this->addCc($monographStageAssignment->getEmail(), $monographStageAssignment->getFullName());
+			$returner[] =& $monographStageAssignment;
+			unset($monographStageAssignment);
 		}
 		return $returner;
 	}
 
-	function toAssignedReviewingSeriesEditors($monographId) {
+	function toAssignedSeriesEditors($monographId) {
+		$userGroupDao =& DAORegistry::getDAO('UserGroupDAO');
+		$userGroupId = $userGroupDao->getByRoleId($this->press->getId(), ROLE_ID_SERIES_EDITOR);
+
 		$returner = array();
-		$editAssignmentDao =& DAORegistry::getDAO('EditAssignmentDAO');
-		$editAssignments =& $editAssignmentDao->getReviewingSeriesEditorAssignmentsByMonographId($monographId);
-		while ($editAssignment =& $editAssignments->next()) {
-			$this->addRecipient($editAssignment->getEditorEmail(), $editAssignment->getEditorFullName());
-			$returner[] =& $editAssignment;
-			unset($editAssignment);
+		$monographStageAssignmentDao =& DAORegistry::getDAO('MonographStageAssignmentDAO');
+		$monographStageAssignments =& $monographStageAssignmentDao->getUsersByMonographId($monographId, null, $userGroupId);
+		while ($monographStageAssignment =& $monographStageAssignments->next()) {
+			$this->addRecipient($monographStageAssignment->getEmail(), $monographStageAssignment->getFullName());
+			$returner[] =& $monographStageAssignment;
+			unset($monographStageAssignment);
 		}
 		return $returner;
 	}
 
-	function toAssignedEditingSeriesEditors($monographId) {
+	function ccAssignedSeriesEditors($monographId) {
+		$userGroupDao =& DAORegistry::getDAO('UserGroupDAO');
+		$userGroupId = $userGroupDao->getByRoleId($this->press->getId(), ROLE_ID_SERIES_EDITOR);
+
 		$returner = array();
-		$editAssignmentDao =& DAORegistry::getDAO('EditAssignmentDAO');
-		$editAssignments =& $editAssignmentDao->getEditingSeriesEditorAssignmentsByMonographId($monographId);
-		while ($editAssignment =& $editAssignments->next()) {
-			$this->addRecipient($editAssignment->getEditorEmail(), $editAssignment->getEditorFullName());
-			$returner[] =& $editAssignment;
-			unset($editAssignment);
+		$monographStageAssignmentDao =& DAORegistry::getDAO('MonographStageAssignmentDAO');
+		$monographStageAssignments =& $monographStageAssignmentDao->getUsersByMonographId($monographId, null, $userGroupId);
+		while ($monographStageAssignment =& $monographStageAssignments->next()) {
+			$this->addCc($monographStageAssignment->getEmail(), $monographStageAssignment->getFullName());
+			$returner[] =& $monographStageAssignment;
+			unset($monographStageAssignment);
 		}
 		return $returner;
 	}
 
-	function ccAssignedReviewingSeriesEditors($monographId) {
-		$returner = array();
-		$editAssignmentDao =& DAORegistry::getDAO('EditAssignmentDAO');
-		$editAssignments =& $editAssignmentDao->getReviewingSeriesEditorAssignmentsByMonographId($monographId);
-		while ($editAssignment =& $editAssignments->next()) {
-			$this->addCc($editAssignment->getEditorEmail(), $editAssignment->getEditorFullName());
-			$returner[] =& $editAssignment;
-			unset($editAssignment);
-		}
-		return $returner;
-	}
-
-	function ccAssignedEditingSeriesEditors($monographId) {
-		$returner = array();
-		$editAssignmentDao =& DAORegistry::getDAO('EditAssignmentDAO');
-		$editAssignments =& $editAssignmentDao->getEditingSeriesEditorAssignmentsByMonographId($monographId);
-		while ($editAssignment =& $editAssignments->next()) {
-			$this->addCc($editAssignment->getEditorEmail(), $editAssignment->getEditorFullName());
-			$returner[] =& $editAssignment;
-			unset($editAssignment);
-		}
-		return $returner;
-	}
 }
 
 ?>
