@@ -250,5 +250,19 @@ class EditorDecisionHandler extends Handler {
 		}
 		return $json->getString();
 	}
+
+	/**
+	 * Promote the submission into the production stage
+	 * @param $args array
+	 * @param $request PKPRequest
+	 * @return JSON
+	 */
+	function sendToProduction(&$args, &$request) {
+		// FIXME #5898 : Implement -- Is this just a confirm dialog or a modal?
+		$monographId = $request->getUserVar('monographId');
+
+		$json = new JSON('true');
+		return $json->getString();
+	}
 }
 ?>
