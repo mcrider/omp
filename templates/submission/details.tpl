@@ -16,6 +16,8 @@
 
 {include file="submission/header.tpl"}
 
+<a href="{url page="workflow" op="copyediting" path=$monograph->getId()}">{translate key="submission.copyediting"}</a>
+
 {url|assign:submissionFilesGridUrl router=$smarty.const.ROUTE_COMPONENT component="grid.files.submissionFiles.SubmissionDetailsFilesGridHandler" op="fetchGrid" monographId=$monograph->getId()}
 {load_url_in_div id="submissionFilesGridDiv" url=$submissionFilesGridUrl}
 
