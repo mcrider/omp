@@ -66,6 +66,7 @@
 		});
 		$("#denyRevision").click(function() {
 			$("#possibleRevision").hide();
+			return false;
 		});
 
 		// Set cancel/continue button behaviors
@@ -90,7 +91,7 @@
 </script>
 
 
-<form name="uploadForm" id="uploadForm" action="{url op="uploadFile" monographId=$monographId fileId=$fileId}" method="post">
+<form name="uploadForm" id="uploadForm" action="{url op="uploadFile" monographId=$monographId fileId=$fileId fileStage=$fileStage}" method="post">
 	{fbvFormArea id="file"}
 		{fbvFormSection title="common.fileType" required=1}
 			{fbvSelect name="fileType" id="fileType" from=$bookFileTypes translate=false selected=$currentFileType}

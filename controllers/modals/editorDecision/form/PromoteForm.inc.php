@@ -124,11 +124,28 @@ class PromoteForm extends Form {
 				// 1. Record the decision
 				SeriesEditorAction::recordDecision($seriesEditorSubmission, SUBMISSION_EDITOR_DECISION_ACCEPT);
 
-				// 2. select email key
+				// 2. Select email key
 				$emailKey = 'EDITOR_DECISION_ACCEPT';
 
 				// 3. Set status of round
 				$status = REVIEW_ROUND_STATUS_ACCEPTED;
+
+				// 4. Update monograph stage
+				$monographDao =& DAORegistry::getDAO('MonographDAO');
+				$monograph = $this->getMonograph();
+				$monograph->setCurrentStageId(WORKFLOW_STAGE_ID_EDITING);
+				$monographDao->updateMonograph();
+
+				// 5.  Set files for final draft (set type to 'final')
+				$selectedFiles = $this->getData('selectedFiles');
+				$monographFileDAO =& DAORegistry::getDAO('MonographFileDAO');
+				foreach ($selectedFiles as $selectedFile) {
+					$fileParts = explode("-", $selectedFile);
+					$monographFile =& $monographFileDAO->getMonographFile($fileParts[0], $fileParts[1]);
+					$monographFile->setType('final');
+					$monographFileDAO->updateMonographFile($monographFile);
+					unset($monographFile);
+				}
 				break;
 			case SUBMISSION_EDITOR_DECISION_EXTERNAL_REVIEW:
 				// 1. Record the decision
