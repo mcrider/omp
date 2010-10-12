@@ -139,7 +139,7 @@ class RoleDAO extends DAO {
 	}
 
 	/**
-	 * Return an array of row objects corresponding to the roles a given use has
+	 * Return an array of role objects corresponding to the roles a given user has
 	 * @param $userId
 	 * @param $pressId
 	 * @return array of Roles
@@ -148,8 +148,8 @@ class RoleDAO extends DAO {
 		$params = array($userId);
 		if ($pressId) $params[] = $pressId;
 		$result =& $this->retrieve('SELECT DISTINCT ug.role_id
-									FROM user_groups ug JOIN user_user_groups uug ON ug.user_id = u
-									WHERE ugg.user_id = ?' . ($pressId?' AND ug.press_id = ?':''),
+									FROM user_groups ug JOIN user_user_groups uug ON ug.user_group_id = uug.user_group_id
+									WHERE uug.user_id = ?' . ($pressId?' AND ug.press_id = ?':''),
 									$params);
 
 		$roles = array();
