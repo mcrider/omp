@@ -181,7 +181,7 @@ class SubmissionFilesGridHandler extends GridHandler {
 		$fileId = $request->getUserVar('fileId') ? $request->getUserVar('fileId'): null;
 		$monographId = $request->getUserVar('monographId');
 		$fileStage = $request->getUserVar('fileStage');
-		$fileStage = empty($fileStage) ? MONOGRAPH_FILE_SUBMISSION: $request->getUserVar('fileStage');
+		$fileStage = empty($fileStage) ? MONOGRAPH_FILE_USE_CASE_SUBMISSION: $request->getUserVar('fileStage');
 		$isRevision = $request->getUserVar('isRevision');
 		$isRevision = empty($isRevision) ? false: $request->getUserVar('isRevision');
 
@@ -190,7 +190,7 @@ class SubmissionFilesGridHandler extends GridHandler {
 		$fileForm->readInputData();
 
 		// Check to see if the file uploaded might be a revision to an existing file
-		if(!$fileId && !$isRevision && ($fileStage == MONOGRAPH_FILE_SUBMISSION || $fileStage == MONOGRAPH_FILE_REVIEW)) {
+		if(!$fileId && !$isRevision && ($fileStage == MONOGRAPH_FILE_USE_CASE_SUBMISSION || $fileStage == MONOGRAPH_FILE_USE_CASE_REVIEW)) {
 			$possibleRevision = $fileForm->checkForRevision($args, &$request);
 		} else $possibleRevision = false;
 

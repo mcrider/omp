@@ -137,7 +137,7 @@ class SubmissionHandler extends Handler {
 				'add_item'
 			);
 		import('classes.monograph.MonographFile');
-		$actionArgs['fileStage'] = MONOGRAPH_FILE_REVIEW;
+		$actionArgs['fileStage'] = MONOGRAPH_FILE_USE_CASE_REVIEW;
 		$uploadRevisionAction = new LinkAction(
 				'addRevision',
 				LINK_ACTION_MODE_MODAL,
@@ -147,7 +147,7 @@ class SubmissionHandler extends Handler {
 				null,
 				'edit'
 			);
-		$actionArgs['fileStage'] = MONOGRAPH_FILE_COPYEDIT;
+		$actionArgs['fileStage'] = MONOGRAPH_FILE_USE_CASE_COPYEDIT;
 		$addCopyeditedFileAction = new LinkAction(
 				'addCopyeditedFile',
 				LINK_ACTION_MODE_MODAL,

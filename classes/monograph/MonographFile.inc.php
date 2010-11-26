@@ -17,20 +17,20 @@
 
 import('lib.pkp.classes.submission.SubmissionFile');
 
-// File Type IDs
-define('MONOGRAPH_FILE_PUBLIC', 0x000001);
-define('MONOGRAPH_FILE_SUBMISSION', 0x000002);
-define('MONOGRAPH_FILE_NOTE', 0x000004);
-define('MONOGRAPH_FILE_REVIEW', 0x000005);
-define('MONOGRAPH_FILE_FINAL', 0x000006);
-define('MONOGRAPH_FILE_FAIR_COPY', 0x000007);
-define('MONOGRAPH_FILE_EDITOR', 0x000008);
-define('MONOGRAPH_FILE_COPYEDIT', 0x000009);
-define('MONOGRAPH_FILE_PRODUCTION', 0x000010);
-define('MONOGRAPH_FILE_GALLEY', 0x000011);
-define('MONOGRAPH_FILE_LAYOUT', 0x000012);
-define('MONOGRAPH_FILE_ATTACHMENT', 0x000013);
-define('MONOGRAPH_FILE_COPYEDIT_RESPONSE', 0x000014);
+// Use case IDs
+define('MONOGRAPH_FILE_USE_CASE_PUBLIC', 0x000001);
+define('MONOGRAPH_FILE_USE_CASE_SUBMISSION', 0x000002);
+define('MONOGRAPH_FILE_USE_CASE_NOTE', 0x000004);
+define('MONOGRAPH_FILE_USE_CASE_REVIEW', 0x000005);
+define('MONOGRAPH_FILE_USE_CASE_FINAL', 0x000006);
+define('MONOGRAPH_FILE_USE_CASE_FAIR_COPY', 0x000007);
+define('MONOGRAPH_FILE_USE_CASE_EDITOR', 0x000008);
+define('MONOGRAPH_FILE_USE_CASE_COPYEDIT', 0x000009);
+define('MONOGRAPH_FILE_USE_CASE_PRODUCTION', 0x000010);
+define('MONOGRAPH_FILE_USE_CASE_GALLEY', 0x000011);
+define('MONOGRAPH_FILE_USE_CASE_LAYOUT', 0x000012);
+define('MONOGRAPH_FILE_USE_CASE_ATTACHMENT', 0x000013);
+define('MONOGRAPH_FILE_USE_CASE_COPYEDIT_RESPONSE', 0x000014);
 
 class MonographFile extends SubmissionFile {
 
@@ -49,7 +49,7 @@ class MonographFile extends SubmissionFile {
 		import('classes.file.MonographFileManager');
 		$monographDao =& DAORegistry::getDAO('MonographDAO'); /* @var $monographDao MonographDAO */
 		$monograph =& $monographDao->getMonograph($this->getMonographId());
-		return $monograph->getFilePath() . MonographFileManager::typeToPath($this->getType()) . '/' . $this->getFileName();
+		return $monograph->getFilePath() . MonographFileManager::useCaseToPath($this->getUseCase()) . '/' . $this->getFileName();
 	}
 
 

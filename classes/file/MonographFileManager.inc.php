@@ -76,13 +76,13 @@ class MonographFileManager extends FileManager {
 	/**
 	 * Upload a monograph file.
 	 * @param $fileName string the name of the file used in the POST form
-	 * @param $typeId int genre (e.g. Manuscript, Appendix, etc.)
+	 * @param $useCase int genre (e.g. Manuscript, Appendix, etc.)
 	 * @param $fileId int
 	 * @param $genreId int
 	 * @return int file ID, is false if failure
 	 */
-	function uploadMonographFile($fileName, $typeId = MONOGRAPH_FILE_SUBMISSION, $fileId = null, $genreId = null) {
-		return $this->_handleUpload($fileName, $typeId, $fileId, $genreId);
+	function uploadMonographFile($fileName, $useCase = MONOGRAPH_FILE_USE_CASE_SUBMISSION, $fileId = null, $genreId = null) {
+		return $this->_handleUpload($fileName, $useCase, $fileId, $genreId);
 	}
 
 	/**
@@ -93,7 +93,7 @@ class MonographFileManager extends FileManager {
 	 */
 	function uploadReviewFile($fileName, $fileId = null, $reviewId = null) {
 		$assocType = $reviewId ? ASSOC_TYPE_REVIEW_ASSIGNMENT : null;
-		return $this->_handleUpload($fileName, MONOGRAPH_FILE_REVIEW, $fileId, null, $reviewId, $assocType);
+		return $this->_handleUpload($fileName, MONOGRAPH_FILE_USE_CASE_REVIEW, $fileId, null, $reviewId, $assocType);
 	}
 
 	/**
@@ -103,7 +103,7 @@ class MonographFileManager extends FileManager {
 	 * @return int file ID, is false if failure
 	 */
 	function uploadCopyeditResponseFile($fileName, $fileId = null) {
-		return $this->_handleUpload($fileName, MONOGRAPH_FILE_COPYEDIT_RESPONSE, $fileId);
+		return $this->_handleUpload($fileName, MONOGRAPH_FILE_USE_CASE_COPYEDIT_RESPONSE, $fileId);
 	}
 
 	/**
@@ -239,38 +239,38 @@ class MonographFileManager extends FileManager {
 	}
 
 	/**
-	 * Return type path associated with a type code.
-	 * @param $type string
+	 * Return path associated with a useCase code.
+	 * @param $useCase string
 	 * @return string
 	 */
-	function typeToPath($type) {
-		switch ($type) {
-			case MONOGRAPH_FILE_PUBLIC: return 'public';
-			case MONOGRAPH_FILE_SUBMISSION: return 'submission';
-			case MONOGRAPH_FILE_NOTE: return 'note';
-			case MONOGRAPH_FILE_REVIEW: return 'submission/review';
-			case MONOGRAPH_FILE_FINAL: return 'submission/final';
-			case MONOGRAPH_FILE_FAIR_COPY: return 'submission/fairCopy';
-			case MONOGRAPH_FILE_EDITOR: return 'submission/editor';
-			case MONOGRAPH_FILE_COPYEDIT: return 'submission/copyedit';
-			case MONOGRAPH_FILE_PRODUCTION: return 'submission/production';
-			case MONOGRAPH_FILE_GALLEY: return 'submission/galleys';
-			case MONOGRAPH_FILE_LAYOUT: return 'submission/layout';
-			case MONOGRAPH_FILE_ATTACHMENT: default: return 'attachment';
+	function useCaseToPath($useCase) {
+		switch ($useCase) {
+			case MONOGRAPH_FILE_USE_CASE_PUBLIC: return 'public';
+			case MONOGRAPH_FILE_USE_CASE_SUBMISSION: return 'submission';
+			case MONOGRAPH_FILE_USE_CASE_NOTE: return 'note';
+			case MONOGRAPH_FILE_USE_CASE_REVIEW: return 'submission/review';
+			case MONOGRAPH_FILE_USE_CASE_FINAL: return 'submission/final';
+			case MONOGRAPH_FILE_USE_CASE_FAIR_COPY: return 'submission/fairCopy';
+			case MONOGRAPH_FILE_USE_CASE_EDITOR: return 'submission/editor';
+			case MONOGRAPH_FILE_USE_CASE_COPYEDIT: return 'submission/copyedit';
+			case MONOGRAPH_FILE_USE_CASE_PRODUCTION: return 'submission/production';
+			case MONOGRAPH_FILE_USE_CASE_GALLEY: return 'submission/galleys';
+			case MONOGRAPH_FILE_USE_CASE_LAYOUT: return 'submission/layout';
+			case MONOGRAPH_FILE_USE_CASE_ATTACHMENT: default: return 'attachment';
 		}
 	}
 
 	/**
 	 * Copy a temporary file to a monograph file.
 	 * @param $temporaryFile MonographFile
-	 * @param $type integer
+	 * @param $useCase integer
 	 * @param $assocId integer
 	 * @param $assocType integer
 	 * @return integer the file ID (false if upload failed)
 	 */
-	function temporaryFileToMonographFile(&$temporaryFile, $type, $assocId, $assocType) {
+	function temporaryFileToMonographFile(&$temporaryFile, $useCase, $assocId, $assocType) {
 		// Instantiate and pre-populate the new target monograph file.
-		$monographFile =& $this->_instantiateMonographFile(null, $type, null, $assocId, $assocType);
+		$monographFile =& $this->_instantiateMonographFile(null, $useCase, null, $assocId, $assocType);
 
 		// Transfer data from the temporary file to the monograph file.
 		$monographFile->setFileType($temporaryFile->getFileType());
@@ -288,16 +288,16 @@ class MonographFileManager extends FileManager {
 	/**
 	 * Upload the file and add it to the database.
 	 * @param $fileName string index into the $_FILES array
-	 * @param $type int identifying type (i.e. MONOGRAPH_FILE_*)
+	 * @param $type int identifying type (i.e. MONOGRAPH_FILE_USE_CASE_*)
 	 * @param $fileId int ID of an existing file to update
-	 * @param $genreId int foreign key into monograph_file_types table (e.g. manuscript, etc.)
+	 * @param $genreId int foreign key into MONOGRAPH_FILE_USE_CASE_types table (e.g. manuscript, etc.)
 	 * @param $assocType int
 	 * @param $assocId int
 	 * @return int the file ID (false if upload failed)
 	 */
-	function _handleUpload($fileName, $type, $fileId = null, $genreId = null, $assocId = null, $assocType = null) {
+	function _handleUpload($fileName, $useCase, $fileId = null, $genreId = null, $assocId = null, $assocType = null) {
 		// Instantiate and pre-populate a new monograph file object.
-		$monographFile = $this->_instantiateMonographFile($fileId, $type, $genreId, $assocId, $assocType);
+		$monographFile = $this->_instantiateMonographFile($fileId, $useCase, $genreId, $assocId, $assocType);
 
 		// Retrieve file information from the uploaded file.
 		assert(isset($_FILES[$fileName]));
@@ -317,12 +317,12 @@ class MonographFileManager extends FileManager {
 	/**
 	 * Routine to instantiate and pre-populate a new monograph file.
 	 * @param $fileId integer
-	 * @param $type integer
+	 * @param $useCase integer
 	 * @param $assocId integer
 	 * @param $assocType integer
 	 * @return MonographFile
 	 */
-	function &_instantiateMonographFile($fileId, $type, $genreId, $assocId, $assocType) {
+	function &_instantiateMonographFile($fileId, $useCase, $genreId, $assocId, $assocType) {
 		// Instantiate a new monograph file.
 		$monographFile = new MonographFile();
 		$monographFile->setMonographId($this->getMonographId());
@@ -342,8 +342,8 @@ class MonographFileManager extends FileManager {
 		$monographFile->setFileName('unknown');
 		$monographFile->setFileSize(0);
 
-		// Set the file use case type.
-		$monographFile->setType($type);
+		// Set the file use case.
+		$monographFile->setUseCase($useCase);
 
 		// Set the monograph genre (if given).
 		if(isset($genreId)) {
@@ -412,8 +412,6 @@ class MonographFileManager extends FileManager {
 	 * Generate a unique filename for a monograph file. Sets the filename
 	 * field in the monographFile to the generated value.
 	 * @param $monographFile MonographFile the monograph to generate a filename for
-	 * @param $type integer one of the MONOGRAPH_FILE_* constants
-	 * @param $originalName string the name of the original file
 	 */
 	function _generateAndPopulateFileName(&$monographFile) {
 		// If the file has a file genre set then start the
@@ -429,7 +427,7 @@ class MonographFileManager extends FileManager {
 
 		// Make the file name unique across all files and file revisions.
 		$extension = $this->parseFileExtension($monographFile->getOriginalFileName());
-		$fileName .= $monographFile->getMonographId().'-'.$monographFile->getFileId().'-'.$monographFile->getRevision().'-'.$monographFile->getType().'.'.$extension;
+		$fileName .= $monographFile->getMonographId().'-'.$monographFile->getFileId().'-'.$monographFile->getRevision().'-'.$monographFile->getUseCase().'.'.$extension;
 
 		// Populate the monograph file with the generated file name.
 		$monographFile->setFileName($fileName);

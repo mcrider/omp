@@ -69,7 +69,7 @@ class CopyeditingFilesGridHandler extends CategoryGridHandler {
 		// Grab the copyediting files to display as categories
 		$monographFileDao =& DAORegistry::getDAO('MonographFileDAO');
 		$monograph =& $this->getAuthorizedContextObject(ASSOC_TYPE_MONOGRAPH);
-		$monographFiles =& $monographFileDao->getByMonographId($monograph->getId(), MONOGRAPH_FILE_COPYEDIT);
+		$monographFiles =& $monographFileDao->getByMonographId($monograph->getId(), MONOGRAPH_FILE_USE_CASE_COPYEDIT);
 		$rowData = array();
 		foreach ($monographFiles as $monographFile) {
 			$rowData[$monographFile->getFileId()] = $monographFile;
@@ -84,7 +84,7 @@ class CopyeditingFilesGridHandler extends CategoryGridHandler {
 				'uploadFile',
 				LINK_ACTION_MODE_MODAL,
 				LINK_ACTION_TYPE_APPEND,
-				$router->url($request, null, 'grid.files.submissionFiles.CopyeditingSubmissionFilesGridHandler', 'addFile', null, array('monographId' => $monograph->getId(), 'fileStage' => MONOGRAPH_FILE_COPYEDIT)),
+				$router->url($request, null, 'grid.files.submissionFiles.CopyeditingSubmissionFilesGridHandler', 'addFile', null, array('monographId' => $monograph->getId(), 'fileStage' => MONOGRAPH_FILE_USE_CASE_COPYEDIT)),
 				'editor.monograph.fairCopy.addFile',
 				null,
 				'add'
@@ -217,7 +217,7 @@ class CopyeditingFilesGridHandler extends CategoryGridHandler {
 			$copyeditingUserForm->execute();
 
 			$monographFileDao =& DAORegistry::getDAO('MonographFileDAO');
-			$monographFiles =& $monographFileDao->getByMonographId($monograph->getId(), MONOGRAPH_FILE_COPYEDIT);
+			$monographFiles =& $monographFileDao->getByMonographId($monograph->getId(), MONOGRAPH_FILE_USE_CASE_COPYEDIT);
 			$data = array();
 			foreach ($monographFiles as $monographFile) {
 				$data[$monographFile->getFileId()] = $monographFile;

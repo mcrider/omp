@@ -50,7 +50,7 @@ class AuthorCopyeditingFilesUploadForm extends CopyeditingFileForm {
 
 		$this->_data['monographFileOptions'] =& $monographFileOptions;
 
-		$this->_data['fileStage'] = MONOGRAPH_FILE_COPYEDIT;
+		$this->_data['fileStage'] = MONOGRAPH_FILE_USE_CASE_COPYEDIT;
 		$this->_data['isRevision'] = false;
 	}
 

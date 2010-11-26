@@ -57,9 +57,9 @@ class ReviewerReviewAttachmentsGridHandler extends ReviewAttachmentsGridHandler 
 
 		$monographFileDao =& DAORegistry::getDAO('MonographFileDAO');
 		if (!$reviewId && $monographId ) {
-			$monographFiles =& $monographFileDao->getByMonographId($monographId, MONOGRAPH_FILE_ATTACHMENT);
+			$monographFiles =& $monographFileDao->getByMonographId($monographId, MONOGRAPH_FILE_USE_CASE_ATTACHMENT);
 		} else {
-			$monographFiles =& $monographFileDao->getMonographFilesByAssocId($reviewId, MONOGRAPH_FILE_ATTACHMENT);
+			$monographFiles =& $monographFileDao->getMonographFilesByAssocId($reviewId, MONOGRAPH_FILE_USE_CASE_ATTACHMENT);
 		}
 		$this->setData($monographFiles);
 

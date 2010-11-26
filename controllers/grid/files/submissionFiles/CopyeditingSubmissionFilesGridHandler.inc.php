@@ -156,10 +156,10 @@ class CopyeditingSubmissionFilesGridHandler extends SubmissionFilesGridHandler {
 		$templateMgr->assign('fileId', $fileId);
 
 		// Get the grid ID from the file type, so fileSubmissionComplete.tpl knows which grid to update
-		$fileTypeToGridId = array(MONOGRAPH_FILE_FINAL => 'finalDraftFilesSelect',
-									MONOGRAPH_FILE_COPYEDIT => 'copyeditingFiles',
-									MONOGRAPH_FILE_FAIR_COPY => 'fairCopyFiles');
-		$templateMgr->assign('gridId', $fileTypeToGridId[$monographFile->getType()]);
+		$fileTypeToGridId = array(MONOGRAPH_FILE_USE_CASE_FINAL => 'finalDraftFilesSelect',
+									MONOGRAPH_FILE_USE_CASE_COPYEDIT => 'copyeditingFiles',
+									MONOGRAPH_FILE_USE_CASE_FAIR_COPY => 'fairCopyFiles');
+		$templateMgr->assign('gridId', $fileTypeToGridId[$monographFile->getUseCase()]);
 
 		$json = new JSON('true', $templateMgr->fetch('controllers/grid/files/submissionFiles/form/fileSubmissionComplete.tpl'));
 		return $json->getString();
@@ -181,14 +181,14 @@ class CopyeditingSubmissionFilesGridHandler extends SubmissionFilesGridHandler {
 
 		if($monographFile) {
 			// Get the handler path and name from the file type, so fileSubmissionComplete.tpl knows which grid to update
-			$fileTypeToHandlerPath = array(MONOGRAPH_FILE_FINAL => 'controllers.grid.files.finalDraftFiles.FinalDraftFilesGridHandler',
-									MONOGRAPH_FILE_COPYEDIT => 'controllers.grid.files.copyeditingFiles.CopyeditingFilesGridHandler',
-									MONOGRAPH_FILE_FAIR_COPY => 'controllers.grid.files.fairCopyFiles.FairCopyFilesGridHandler');
-			$fileTypeToHandlerName = array(MONOGRAPH_FILE_FINAL => 'FinalDraftFilesGridHandler',
-									MONOGRAPH_FILE_COPYEDIT => 'CopyeditingFilesGridHandler',
-									MONOGRAPH_FILE_FAIR_COPY => 'FairCopyFilesGridHandler');
-			import($fileTypeToHandlerPath[$monographFile->getType()]);
-			$filesGridHandler =& new $fileTypeToHandlerName[$monographFile->getType()]();
+			$fileTypeToHandlerPath = array(MONOGRAPH_FILE_USE_CASE_FINAL => 'controllers.grid.files.finalDraftFiles.FinalDraftFilesGridHandler',
+									MONOGRAPH_FILE_USE_CASE_COPYEDIT => 'controllers.grid.files.copyeditingFiles.CopyeditingFilesGridHandler',
+									MONOGRAPH_FILE_USE_CASE_FAIR_COPY => 'controllers.grid.files.fairCopyFiles.FairCopyFilesGridHandler');
+			$fileTypeToHandlerName = array(MONOGRAPH_FILE_USE_CASE_FINAL => 'FinalDraftFilesGridHandler',
+									MONOGRAPH_FILE_USE_CASE_COPYEDIT => 'CopyeditingFilesGridHandler',
+									MONOGRAPH_FILE_USE_CASE_FAIR_COPY => 'FairCopyFilesGridHandler');
+			import($fileTypeToHandlerPath[$monographFile->getUseCase()]);
+			$filesGridHandler =& new $fileTypeToHandlerName[$monographFile->getUseCase()]();
 			$filesGridHandler->authorize($request, $args, $filesGridHandler->getRoleAssignments());
 			if(is_a($filesGridHandler, 'FinalDraftFilesGridHandler')) {
 				$filesGridHandler->setIsSelectable(true);

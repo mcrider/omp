@@ -108,7 +108,7 @@ class AuthorCopyeditingFilesGridHandler extends GridHandler {
 	 */
 	function addCopyeditedFile($args, &$request) {
 		import('classes.monograph.MonographFile');
-		$fileStage = MONOGRAPH_FILE_COPYEDIT;
+		$fileStage = MONOGRAPH_FILE_USE_CASE_COPYEDIT;
 
 		$templateMgr =& TemplateManager::getManager();
 		$templateMgr->assign('monographId', $request->getUserVar('monographId'));

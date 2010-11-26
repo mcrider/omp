@@ -134,7 +134,7 @@ class FinalDraftFilesGridHandler extends GridHandler {
 			$templateMgr =& TemplateManager::getManager();
 			$selectedFileIds = array();
 			foreach ($monographFiles as $monographFile) {
-				if($monographFile->getType() == MONOGRAPH_FILE_FINAL) {
+				if($monographFile->getUseCase() == MONOGRAPH_FILE_USE_CASE_FINAL) {
 					$selectedFileIds[] = $monographFile->getFileId() . "-" . $monographFile->getRevision();
 				}
 			}
@@ -147,7 +147,7 @@ class FinalDraftFilesGridHandler extends GridHandler {
 						'uploadFile',
 						LINK_ACTION_MODE_MODAL,
 						LINK_ACTION_TYPE_APPEND,
-						$router->url($request, null, 'grid.files.submissionFiles.CopyeditingSubmissionFilesGridHandler', 'addFile', null, array('monographId' => $monographId, 'fileStage' => MONOGRAPH_FILE_FINAL)),
+						$router->url($request, null, 'grid.files.submissionFiles.CopyeditingSubmissionFilesGridHandler', 'addFile', null, array('monographId' => $monographId, 'fileStage' => MONOGRAPH_FILE_USE_CASE_FINAL)),
 						'editor.submissionArchive.uploadFile',
 						null,
 						'add'
@@ -159,7 +159,7 @@ class FinalDraftFilesGridHandler extends GridHandler {
 			$this->setId('finalDraftFiles');
 
 			// Grab only the final draft files.
-			$monographFiles =& $monographFileDao->getByMonographId($monographId, MONOGRAPH_FILE_FINAL);
+			$monographFiles =& $monographFileDao->getByMonographId($monographId, MONOGRAPH_FILE_USE_CASE_FINAL);
 			$rowData = array();
 			foreach ($monographFiles as $monographFile) {
 				$rowData[$monographFile->getFileId()] = $monographFile;

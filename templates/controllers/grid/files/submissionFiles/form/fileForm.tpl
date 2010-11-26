@@ -25,7 +25,7 @@
 				{if $isRevision}
 					isRevision: true,
 					submissionFileId: $('#submissionFiles').val()
-				{elseif $fileStage == $smarty.const.MONOGRAPH_FILE_COPYEDIT && !$isEditing}
+				{elseif $fileStage == $smarty.const.MONOGRAPH_FILE_USE_CASE_COPYEDIT && !$isEditing}
 					copyeditingSignoffId: $('#copyeditingFiles').val()
 				{else}
 					genreId: $('#genreId').val()
@@ -66,14 +66,14 @@
 			url : $("#uploadForm").attr('action'),
 			max_file_size : '20mb',
 			multi_selection: false,
-			file_data_name: {/literal}{if $fileStage == $smarty.const.MONOGRAPH_FILE_COPYEDIT}'copyeditingFile'{else}'submissionFile'{/if}{literal},
+			file_data_name: {/literal}{if $fileStage == $smarty.const.MONOGRAPH_FILE_USE_CASE_COPYEDIT}'copyeditingFile'{else}'submissionFile'{/if}{literal},
 			multipart: true,
 			multipart_params : {{/literal}
 				fileStage: '{$fileStage}',
 				{if $isRevision}
 					isRevision: true,
 					submissionFileId: $('#submissionFiles').val()
-				{elseif $fileStage == $smarty.const.MONOGRAPH_FILE_COPYEDIT && !$isEditing}
+				{elseif $fileStage == $smarty.const.MONOGRAPH_FILE_USE_CASE_COPYEDIT && !$isEditing}
 					copyeditingSignoffId: $('#copyeditingFiles').val()
 				{else}
 					genreId: $('#genreId').val()
@@ -136,7 +136,7 @@
 				<p>{translate key="submission.upload.selectFileToRevise"}</p>
 				{fbvSelect name="submissionFiles" id="submissionFiles" from=$monographFileOptions translate=false} <br />
 			{/fbvFormSection}
-		{elseif $fileStage == $smarty.const.MONOGRAPH_FILE_COPYEDIT && !$isEditing}
+		{elseif $fileStage == $smarty.const.MONOGRAPH_FILE_USE_CASE_COPYEDIT && !$isEditing}
 			{fbvFormSection title="submission.originalFile" required=1}
 				<p>{translate key="submission.upload.selectCopyeditedFile"}</p>
 				{fbvSelect name="copyeditingFiles" id="copyeditingFiles" from=$monographFileOptions translate=false} <br />
@@ -157,7 +157,7 @@
 		{/fbvFormSection}
 	{/fbvFormArea}
 
-	{if $fileStage == $smarty.const.MONOGRAPH_FILE_SUBMISSION || $fileStage == $smarty.const.MONOGRAPH_FILE_REVIEW}
+	{if $fileStage == $smarty.const.MONOGRAPH_FILE_USE_CASE_SUBMISSION || $fileStage == $smarty.const.MONOGRAPH_FILE_USE_CASE_REVIEW}
 	<div id="possibleRevision" class="possibleRevision response" style="display:none;">
 		<div id="revisionWarningIcon" class="warning"></div>
 		<div id="revisionWarningText">

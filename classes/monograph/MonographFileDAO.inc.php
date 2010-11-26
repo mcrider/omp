@@ -189,23 +189,23 @@ class MonographFileDAO extends DAO {
 	/**
 	 * Retrieve all monograph files for a monograph.
 	 * @param $monographId int
-	 * @param $type int
+	 * @param $useCase int
 	 * @return array MonographFiles
 	 */
-	function &getByMonographId($monographId, $type = null, $hideAttachments = true) {
+	function &getByMonographId($monographId, $useCase = null, $hideAttachments = true) {
 		$monographFiles = array();
 
 		$sqlParams = array($monographId);
 		$sqlExtra = '';
 
-		if (isset($type)) {
-			$sqlExtra .= ' AND type = ? ';
-			$sqlParams[] = (int)$type;
+		if (isset($useCase)) {
+			$sqlExtra .= ' AND use_case = ? ';
+			$sqlParams[] = (int)$useCase;
 		}
 
 		// Prevent review attachments from showing up in submission file lists
-		if ($type != MONOGRAPH_FILE_REVIEW && $hideAttachments) {
-			$sqlExtra .= ' AND type != '.MONOGRAPH_FILE_REVIEW.' ';
+		if ($useCase != MONOGRAPH_FILE_USE_CASE_REVIEW && $hideAttachments) {
+			$sqlExtra .= ' AND use_case != '.MONOGRAPH_FILE_USE_CASE_REVIEW.' ';
 		}
 
 		$result =& $this->retrieve(
@@ -227,17 +227,17 @@ class MonographFileDAO extends DAO {
 	}
 
 	/**
-	 * Retrieve all monograph files for a type and assoc ID.
+	 * Retrieve all monograph files for a use case and assoc ID.
 	 * @param $assocId int
 	 * @param $type int
 	 * @return array MonographFiles
 	 */
-	function &getMonographFilesByAssocId($assocId, $type) {
+	function &getMonographFilesByAssocId($assocId, $useCase) {
 		$monographFiles = array();
 
 		$result =& $this->retrieve(
-			'SELECT * FROM monograph_files WHERE assoc_id = ? AND type = ?',
-			array($assocId, $type)
+			'SELECT * FROM monograph_files WHERE assoc_id = ? AND use_case = ?',
+			array($assocId, $useCase)
 		);
 
 		while (!$result->EOF) {
@@ -278,7 +278,7 @@ class MonographFileDAO extends DAO {
 		$monographFile->setFileType($row['file_type']);
 		$monographFile->setFileSize($row['file_size']);
 		$monographFile->setOriginalFileName($row['original_file_name']);
-		$monographFile->setType($row['type']);
+		$monographFile->setUseCase($row['use_case']);
 		$monographFile->setUserGroupId($row['user_group_id']);
 		$monographFile->setAssocId($row['assoc_id']);
 		$monographFile->setDateUploaded($this->datetimeFromDB($row['date_uploaded']));
@@ -309,7 +309,7 @@ class MonographFileDAO extends DAO {
 			$monographFile->getFileType(),
 			$monographFile->getFileSize(),
 			$monographFile->getOriginalFileName(),
-			$monographFile->getType(),
+			$monographFile->getUseCase(),
 			$monographFile->getViewable(),
 			$monographFile->getUserGroupId(),
 			$monographFile->getAssocType(),
@@ -323,7 +323,7 @@ class MonographFileDAO extends DAO {
 
 		$this->update(
 			sprintf('INSERT INTO monograph_files
-				(' . ($fileId ? 'file_id, ' : '') . 'revision, monograph_id, source_file_id, source_revision, file_name, file_type, file_size, original_file_name, type, date_uploaded, date_modified, viewable, user_group_id, assoc_type, assoc_id, genre_id)
+				(' . ($fileId ? 'file_id, ' : '') . 'revision, monograph_id, source_file_id, source_revision, file_name, file_type, file_size, original_file_name, use_case, date_uploaded, date_modified, viewable, user_group_id, assoc_type, assoc_id, genre_id)
 				VALUES
 				(' . ($fileId ? '?, ' : '') . '?, ?, ?, ?, ?, ?, ?, ?, ?, %s, %s, ?, ?, ?, ?, ?)',
 				$this->datetimeToDB($monographFile->getDateUploaded()), $this->datetimeToDB($monographFile->getDateModified())),
@@ -353,7 +353,7 @@ class MonographFileDAO extends DAO {
 					file_type = ?,
 					file_size = ?,
 					original_file_name = ?,
-					type = ?,
+					use_case = ?,
 					date_uploaded = %s,
 					date_modified = %s,
 					viewable = ?,
@@ -371,7 +371,7 @@ class MonographFileDAO extends DAO {
 				$monographFile->getFileType(),
 				$monographFile->getFileSize(),
 				$monographFile->getOriginalFileName(),
-				$monographFile->getType(),
+				$monographFile->getUseCase(),
 				$monographFile->getViewable(),
 				$monographFile->getUserGroupId(),
 				$monographFile->getAssocType(),

@@ -7,9 +7,7 @@
  * Files grid form
  *}
 
-{assign var='uniqueId' value=""|uniqid}
-
-{if $fileStage == $smarty.const.MONOGRAPH_FILE_COPYEDIT}
+{if $fileStage == $smarty.const.MONOGRAPH_FILE_USE_CASE_COPYEDIT}
 	{assign var=titleKey value="submission.submit.uploadCopyeditedVersion"}
 {else}
 	{if $isRevision}

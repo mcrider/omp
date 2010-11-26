@@ -30,7 +30,7 @@ class SubmissionFilesUploadForm extends Form {
 	/**
 	 * Constructor.
 	 */
-	function SubmissionFilesUploadForm($fileId = null, $monographId, $fileStage = MONOGRAPH_FILE_SUBMISSION, $isRevision = false) {
+	function SubmissionFilesUploadForm($fileId = null, $monographId, $fileStage = MONOGRAPH_FILE_USE_CASE_SUBMISSION, $isRevision = false) {
 		$this->_fileId = $fileId;
 		$this->_monographId = $monographId;
 		$this->_fileStage = $fileStage;
@@ -128,7 +128,7 @@ class SubmissionFilesUploadForm extends Form {
 		import('classes.file.MonographFileManager');
 		$monographFileManager = new MonographFileManager($monographId);
 
-		if($fileStage == MONOGRAPH_FILE_COPYEDIT) {
+		if($fileStage == MONOGRAPH_FILE_USE_CASE_COPYEDIT) {
 			$uploadedFile = 'copyeditingFile';
 			// The user is uploading a copyedited version of an existing file
 			// Load the existing file to get the genreId
