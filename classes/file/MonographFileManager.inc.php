@@ -76,13 +76,13 @@ class MonographFileManager extends FileManager {
 	/**
 	 * Upload a monograph file.
 	 * @param $fileName string the name of the file used in the POST form
-	 * @param $typeId int monograph file type (e.g. Manusciprt, Appendix, etc.)
+	 * @param $typeId int genre (e.g. Manuscript, Appendix, etc.)
 	 * @param $fileId int
-	 * @param $monographFileTypeId int
+	 * @param $genreId int
 	 * @return int file ID, is false if failure
 	 */
-	function uploadMonographFile($fileName, $typeId = MONOGRAPH_FILE_SUBMISSION, $fileId = null, $monographFileTypeId = null) {
-		return $this->_handleUpload($fileName, $typeId, $fileId, $monographFileTypeId);
+	function uploadMonographFile($fileName, $typeId = MONOGRAPH_FILE_SUBMISSION, $fileId = null, $genreId = null) {
+		return $this->_handleUpload($fileName, $typeId, $fileId, $genreId);
 	}
 
 	/**
@@ -290,14 +290,14 @@ class MonographFileManager extends FileManager {
 	 * @param $fileName string index into the $_FILES array
 	 * @param $type int identifying type (i.e. MONOGRAPH_FILE_*)
 	 * @param $fileId int ID of an existing file to update
-	 * @param $monographFileTypeId int foreign key into monograph_file_types table (e.g. manuscript, etc.)
+	 * @param $genreId int foreign key into monograph_file_types table (e.g. manuscript, etc.)
 	 * @param $assocType int
 	 * @param $assocId int
 	 * @return int the file ID (false if upload failed)
 	 */
-	function _handleUpload($fileName, $type, $fileId = null, $monographFileTypeId = null, $assocId = null, $assocType = null) {
+	function _handleUpload($fileName, $type, $fileId = null, $genreId = null, $assocId = null, $assocType = null) {
 		// Instantiate and pre-populate a new monograph file object.
-		$monographFile = $this->_instantiateMonographFile($fileId, $type, $monographFileTypeId, $assocId, $assocType);
+		$monographFile = $this->_instantiateMonographFile($fileId, $type, $genreId, $assocId, $assocType);
 
 		// Retrieve file information from the uploaded file.
 		assert(isset($_FILES[$fileName]));
@@ -322,7 +322,7 @@ class MonographFileManager extends FileManager {
 	 * @param $assocType integer
 	 * @return MonographFile
 	 */
-	function &_instantiateMonographFile($fileId, $type, $monographFileTypeId, $assocId, $assocType) {
+	function &_instantiateMonographFile($fileId, $type, $genreId, $assocId, $assocType) {
 		// Instantiate a new monograph file.
 		$monographFile = new MonographFile();
 		$monographFile->setMonographId($this->getMonographId());
@@ -346,8 +346,8 @@ class MonographFileManager extends FileManager {
 		$monographFile->setType($type);
 
 		// Set the monograph genre (if given).
-		if(isset($monographFileTypeId)) {
-			$monographFile->setMonographFileTypeId($monographFileTypeId);
+		if(isset($genreId)) {
+			$monographFile->setGenreId($genreId);
 		}
 
 		// Set modification dates to the current system date.
@@ -418,13 +418,13 @@ class MonographFileManager extends FileManager {
 	function _generateAndPopulateFileName(&$monographFile) {
 		// If the file has a file genre set then start the
 		// file name with human readable genre information.
-		$monographFileTypeId = $monographFile->getMonographFileTypeId();
-		if ($monographFileTypeId) {
+		$genreId = $monographFile->getGenreId();
+		if ($genreId) {
 			$primaryLocale = Locale::getPrimaryLocale();
-			$monographFileTypeDao =& DAORegistry::getDAO('MonographFileTypeDAO'); /* @var $monographFileTypeDao MonographFileTypeDAO */
-			$monographFileType =& $monographFileTypeDao->getById($monographFileTypeId);
-			assert(is_a($monographFileType, 'MonographFileType'));
-			$fileName = $monographFileType->getDesignation($primaryLocale).'_'.date('Ymd').'-'.$monographFileType->getName($primaryLocale).'-';
+			$genreDao =& DAORegistry::getDAO('GenreDAO'); /* @var $genreDao GenreDAO */
+			$genre =& $genreDao->getById($genreId);
+			assert(is_a($genre, 'Genre'));
+			$fileName = $genre->getDesignation($primaryLocale).'_'.date('Ymd').'-'.$genre->getName($primaryLocale).'-';
 		}
 
 		// Make the file name unique across all files and file revisions.

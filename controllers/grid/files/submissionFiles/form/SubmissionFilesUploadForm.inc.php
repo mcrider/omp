@@ -54,18 +54,18 @@ class SubmissionFilesUploadForm extends Form {
 			$monographFileDao =& DAORegistry::getDAO('MonographFileDAO');
 			$monographFile =& $monographFileDao->getMonographFile($this->_fileId);
 			$this->_data['monographFileName'] = $monographFile->getOriginalFileName();
-			$this->_data['currentFileType'] = $monographFile->getMonographFileTypeId();
+			$this->_data['currentFileType'] = $monographFile->getGenreId();
 		}
 
 		$context =& $request->getContext();
-		$monographFileTypeDao =& DAORegistry::getDAO('MonographFileTypeDAO');
-		$monographFileTypes = $monographFileTypeDao->getEnabledByPressId($context->getId());
+		$genreDao =& DAORegistry::getDAO('GenreDAO');
+		$genres = $genreDao->getEnabledByPressId($context->getId());
 
-		$monographFileTypeList = array();
-		while($monographFileType =& $monographFileTypes->next()){
-			$monographFileTypeId = $monographFileType->getId();
-			$monographFileTypeList[$monographFileTypeId] = $monographFileType->getLocalizedName();
-			unset($monographFileType);
+		$genreList = array();
+		while($genre =& $genres->next()){
+			$genreId = $genre->getId();
+			$genreList[$genreId] = $genre->getLocalizedName();
+			unset($genre);
 		}
 
 		// Assign monograph files to template to display in revision drop-down menu
@@ -79,7 +79,7 @@ class SubmissionFilesUploadForm extends Form {
 		}
 		$this->_data['monographFileOptions'] =& $monographFileOptions;
 
-		$this->_data['monographFileTypes'] = $monographFileTypeList;
+		$this->_data['genres'] = $genreList;
 		$this->_data['fileStage'] = $this->_fileStage;
 		$this->_data['isRevision'] = $this->_isRevision;
 	}
@@ -89,7 +89,7 @@ class SubmissionFilesUploadForm extends Form {
 	 * @see Form::readInputData()
 	 */
 	function readInputData() {
-		$this->readUserVars(array('gridId', 'fileType'));
+		$this->readUserVars(array('gridId', 'genreId'));
 	}
 
 	/**
@@ -123,7 +123,7 @@ class SubmissionFilesUploadForm extends Form {
 		$fileId = $this->_fileId;
 		$fileStage = $this->_fileStage;
 		assert(!empty($fileStage));
-		$monographFileTypeId = (int)$this->getData('fileType');
+		$genreId = (int)$this->getData('genreId');
 
 		import('classes.file.MonographFileManager');
 		$monographFileManager = new MonographFileManager($monographId);
@@ -131,20 +131,20 @@ class SubmissionFilesUploadForm extends Form {
 		if($fileStage == MONOGRAPH_FILE_COPYEDIT) {
 			$uploadedFile = 'copyeditingFile';
 			// The user is uploading a copyedited version of an existing file
-			// Load the existing file to get the monographFileTypeId
+			// Load the existing file to get the genreId
 		} else {
 			$uploadedFile = 'submissionFile';
 		}
 
 		if ($monographFileManager->uploadedFileExists($uploadedFile)) {
-			$submissionFileId = $monographFileManager->uploadMonographFile($uploadedFile, $fileStage, $fileId, $monographFileTypeId);
+			$submissionFileId = $monographFileManager->uploadMonographFile($uploadedFile, $fileStage, $fileId, $genreId);
 
-			if (!empty($monographFileTypeId)) {
-				$monographFileTypeDao =& DAORegistry::getDAO('MonographFileTypeDAO');
-				$fileType =& $monographFileTypeDao->getById($monographFileTypeId);
+			if (!empty($genreId)) {
+				$genreDao =& DAORegistry::getDAO('GenreDAO');
+				$genre =& $genreDao->getById($genreId);
 
 				// If we're uploading artwork, put an entry in the monograph_artwork_files table
-				if ($fileType->getCategory() == MONOGRAPH_FILE_CATEGORY_ARTWORK && isset($submissionFileId)) {
+				if ($genre->getCategory() == GENRE_CATEGORY_ARTWORK && isset($submissionFileId)) {
 					$artworkFileDao =& DAORegistry::getDAO('ArtworkFileDAO');
 					$artworkFile =& $artworkFileDao->newDataObject();
 					$artworkFile->setFileId($submissionFileId);

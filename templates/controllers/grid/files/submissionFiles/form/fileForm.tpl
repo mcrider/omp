@@ -28,7 +28,7 @@
 				{elseif $fileStage == $smarty.const.MONOGRAPH_FILE_COPYEDIT && !$isEditing}
 					copyeditingSignoffId: $('#copyeditingFiles').val()
 				{else}
-					fileType: $('#fileType').val()
+					genreId: $('#genreId').val()
 				{/if}
 			{literal}};
 		});
@@ -38,7 +38,7 @@
 			returnString = eval("("+ret.response+")");
 
 			if (returnString.status == true) {
-		    		$('#fileType').attr("disabled", "disabled");
+		    		$('#genreId').attr("disabled", "disabled");
 		    		$('div#fileUploadTabs').last().tabs('url', 0, returnString.fileFormUrl);
 		    		$('div#fileUploadTabs').last().tabs('url', 1, returnString.metadataUrl);
 		    		$('#deleteUrl').val(returnString.deleteUrl);
@@ -76,7 +76,7 @@
 				{elseif $fileStage == $smarty.const.MONOGRAPH_FILE_COPYEDIT && !$isEditing}
 					copyeditingSignoffId: $('#copyeditingFiles').val()
 				{else}
-					fileType: $('#fileType').val()
+					genreId: $('#genreId').val()
 				{/if}
 			{literal}},
 
@@ -143,7 +143,7 @@
 			{/fbvFormSection}
 		{else}
 			{fbvFormSection title="common.fileType" required=1}
-				{fbvSelect name="fileType" id="fileType" from=$monographFileTypes translate=false selected=$currentFileType}
+				{fbvSelect name="genreId" id="genreId" from=$genres translate=false selected=$currentGenre}
 			{/fbvFormSection}
 			{if $fileId}
 				{fbvFormSection title="submission.submit.currentFile"}
