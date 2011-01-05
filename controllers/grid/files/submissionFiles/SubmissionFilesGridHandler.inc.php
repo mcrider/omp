@@ -123,7 +123,7 @@ class SubmissionFilesGridHandler extends GridHandler {
 				new ModalLinkAction(
 					'addFile',
 					new WizardModal(
-						$router->url($request, null, null, 'addFile', null, $actionArgs),
+						new PKPUrl($request, ROUTE_COMPONENT, null, null, 'addFile', null, $actionArgs),
 						$this->revisionOnly() ? 'submission.submit.uploadRevision' : 'submission.submit.uploadSubmissionFile',
 						'fileManagement'
 					),
