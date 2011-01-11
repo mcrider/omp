@@ -29,6 +29,7 @@
 <script type="text/javascript" src="{$baseUrl}/lib/pkp/js/classes/Helper.js"></script>
 <script type="text/javascript" src="{$baseUrl}/lib/pkp/js/classes/ObjectProxy.js"></script>
 <script type="text/javascript" src="{$baseUrl}/lib/pkp/js/classes/Handler.js"></script>
+<script type="text/javascript" src="{$baseUrl}/lib/pkp/js/controllers/ListbuilderSwitcherHandler.js"></script>
 <script type="text/javascript" src="{$baseUrl}/lib/pkp/js/controllers/FormHandler.js"></script>
 <script type="text/javascript" src="{$baseUrl}/lib/pkp/js/controllers/TabbedHandler.js"></script>
 <script type="text/javascript" src="{$baseUrl}/lib/pkp/js/controllers/WizardHandler.js"></script>

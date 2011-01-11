@@ -12,28 +12,17 @@
 
 {literal}
 <script type='text/javascript'>
-	<!--
 	// Handle the user group drop-down change event
 	$(function(){
-		$('#userGroupId').change(function() {
-			$.post(
-				'{/literal}{url router=$smarty.const.ROUTE_COMPONENT component="listbuilder.users.StageParticipantListbuilderHandler" op="fetch"}{literal}',
-
-				$(this.form).serialize(),
-				function(jsonData) {
-					if (jsonData.status == false) {
-						// Display error message (if any)
-						alert(jsonData.content);
-					} else {
-						// Load new listbuilder into #submissionParticipantsContainer
-						$("#submissionParticipantsContainer").html(jsonData.content);
-					}
-				},
-				"json"
-			);
-		});
+		$('#userGroupId').pkpHandler(
+			'$.pkp.controllers.ListbuilderSwitcherHandler',
+			{
+				onChangeUrl: '{/literal}{url router=$smarty.const.ROUTE_COMPONENT component="listbuilder.users.StageParticipantListbuilderHandler" op="fetch" monographId=$monographId stageId=$stageId escape=false}{literal}',
+				defaultValue: '3',
+				listbuilderContainer: '#submissionParticipantsContainer'
+			}
+		);
 	});
-	// -->
 </script>
 {/literal}
 
@@ -43,13 +32,7 @@
 	<p>{translate key="submission.submit.addStageParticipant.description"}</p>
 
 	<span style="padding-left:10px;">{fbvSelect name="userGroupId" id="userGroupId" from=$userGroupOptions translate=false}</span>
-
-	{url|assign:submissionParticipantsUrl router=$smarty.const.ROUTE_COMPONENT component="listbuilder.users.StageParticipantListbuilderHandler" op="fetch" userGroupId=$firstUserGroupId monographId=$monographId stageId=$stageId escape=false}
-	{load_url_in_div id="submissionParticipantsContainer" url=$submissionParticipantsUrl}
-
-{if $monographId}
-	<input type="hidden" name="monographId" value="{$monographId|escape}" />
-{/if}
+	<div id="submissionParticipantsContainer"></div>
 </form>
 
 {init_button_bar id="#addStageParticipant"}

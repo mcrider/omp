@@ -48,7 +48,7 @@ class StageParticipantListbuilderHandler extends ListbuilderHandler {
 	 */
 	function initialize(&$request) {
 		parent::initialize($request);
-		$userGroupId = $request->getUserVar('userGroupId');
+		$userGroupId = $request->getUserVar('elementId');
 		$userGroupDao =& DAORegistry::getDAO('UserGroupDAO');
 		$userGroup =& $userGroupDao->getById($userGroupId);
 
@@ -73,7 +73,7 @@ class StageParticipantListbuilderHandler extends ListbuilderHandler {
 		$userDao =& DAORegistry::getDAO('UserDAO');
 
 		$monographId = $request->getUserVar('monographId');
-		$userGroupId = $request->getUserVar('userGroupId');
+		$userGroupId = $request->getUserVar('elementId');
 
 		$monograph =& $monographDao->getMonograph($monographId);
 
@@ -99,7 +99,7 @@ class StageParticipantListbuilderHandler extends ListbuilderHandler {
 	/* Load possible items to populate drop-down list with */
 	function loadPossibleItemList(&$request) {
 		$monographId = $request->getUserVar('monographId');
-		$userGroupId = $request->getUserVar('userGroupId');
+		$userGroupId = $request->getUserVar('elementId');
 
 		// Retrieve all users that belong to the current user group
 		$userGroupDao =& DAORegistry::getDAO('UserGroupDAO');
@@ -130,7 +130,7 @@ class StageParticipantListbuilderHandler extends ListbuilderHandler {
 		$router =& $request->getRouter();
 
 		$monographId = $request->getUserVar('monographId');
-		$userGroupId = $request->getUserVar('userGroupId');
+		$userGroupId = $request->getUserVar('elementId');
 
 		$additionalVars = array('itemId' => $userGroupId,
 			'addUrl' => $router->url($request, array(), null, 'addItem', null, array('monographId' => $monographId, 'userGroupId' => $userGroupId)),
@@ -160,7 +160,7 @@ class StageParticipantListbuilderHandler extends ListbuilderHandler {
 	 */
 	function addItem($args, &$request) {
 		$monographId = $request->getUserVar('monographId');
-		$userGroupId = $request->getUserVar('userGroupId');
+		$userGroupId = $request->getUserVar('elementId');
 
 		$rowId = "selectList-" . $this->getId();
 		$userId = (int) $args[$rowId];
