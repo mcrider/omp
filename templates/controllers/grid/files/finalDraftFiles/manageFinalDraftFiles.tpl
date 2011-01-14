@@ -19,7 +19,7 @@
 		<input type="hidden" name="monographId" value="{$monographId|escape}" />
 
 		<!-- Available submission files -->
-		{url|assign:availableReviewFilesGridUrl router=$smarty.const.ROUTE_COMPONENT component="grid.files.finalDraftFiles.FinalDraftFilesGridHandler" op="fetchGrid" isSelectable=1 canUpload=true monographId=$monographId escape=false}
+		{url|assign:availableReviewFilesGridUrl router=$smarty.const.ROUTE_COMPONENT component="grid.files.finalDraft.FinalDraftFilesGridHandler" op="fetchGrid" isSelectable=1 canUpload=true monographId=$monographId escape=false}
 		{load_url_in_div id="availableReviewFilesGrid" url=$availableReviewFilesGridUrl}
 	</form>
 </div>

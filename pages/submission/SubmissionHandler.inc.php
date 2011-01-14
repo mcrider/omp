@@ -76,7 +76,7 @@ class SubmissionHandler extends Handler {
 				'addFile',
 				LINK_ACTION_MODE_MODAL,
 				LINK_ACTION_TYPE_APPEND,
-				$dispatcher->url($request, ROUTE_COMPONENT, null, 'grid.files.submissionFiles.SubmissionDetailsFilesGridHandler', 'addFile', null, array_merge($actionArgs, array('gridId' => 'submissiondetailsfilesgrid'))),
+				$dispatcher->url($request, ROUTE_COMPONENT, null, 'grid.files.submission.AuthorSubmissionDetailsFilesGridHandler', 'addFile', null, array_merge($actionArgs, array('gridId' => 'submissiondetailsfilesgrid'))),
 				'submission.addFileToBook',
 				null,
 				'add_item'
@@ -87,7 +87,7 @@ class SubmissionHandler extends Handler {
 				'addRevision',
 				LINK_ACTION_MODE_MODAL,
 				LINK_ACTION_TYPE_NOTHING,
-				$dispatcher->url($request, ROUTE_COMPONENT, null, 'grid.files.submissionFiles.SubmissionDetailsFilesGridHandler', 'addRevision', null, array_merge($actionArgs, array('gridId' => 'submissiondetailsfilesgrid'))),
+				$dispatcher->url($request, ROUTE_COMPONENT, null, 'grid.files.submission.AuthorSubmissionDetailsFilesGridHandler', 'addRevision', null, array_merge($actionArgs, array('gridId' => 'submissiondetailsfilesgrid'))),
 				'submission.uploadARevision',
 				null,
 				'edit'
@@ -97,7 +97,7 @@ class SubmissionHandler extends Handler {
 				'addCopyeditedFile',
 				LINK_ACTION_MODE_MODAL,
 				null,
-				$dispatcher->url($request, ROUTE_COMPONENT, null, 'grid.files.authorCopyeditingFiles.AuthorCopyeditingFilesGridHandler', 'addCopyeditedFile', null, array_merge($actionArgs, array('gridId' => 'authorcopyeditingfilesgrid'))),
+				$dispatcher->url($request, ROUTE_COMPONENT, null, 'grid.files.copyedit.AuthorCopyeditingFilesGridHandler', 'addCopyeditedFile', null, array_merge($actionArgs, array('gridId' => 'authorcopyeditingfilesgrid'))),
 				'submission.uploadACopyeditedVersion',
 				null,
 				'add_item'
