@@ -12,8 +12,11 @@
  * @brief Handle requests for the copyediting stage of the submssion workflow.
  */
 
-
 import('classes.handler.Handler');
+
+// import action class
+import('lib.pkp.classes.linkAction.LinkAction');
+import('lib.pkp.classes.linkAction.request.AjaxModal');
 
 class WorkflowHandler extends Handler {
 	/**
@@ -202,13 +205,13 @@ class WorkflowHandler extends Handler {
 		$dispatcher =& $this->getDispatcher();
 		foreach($decisions as $decision => $action) {
 			$actionArgs['decision'] = $decision;
-			$editorActions[] =& new LegacyLinkAction(
+
+			$editorActions[] =& new LinkAction(
 				$action['name'],
-				LINK_ACTION_MODE_MODAL,
-				(isset($action['submitAction']) ? $action['submitAction'] : null),
-				$dispatcher->url($request, ROUTE_COMPONENT, null, 'modals.editorDecision.EditorDecisionHandler', $action['operation'], null, $actionArgs),
+				new AjaxModal(
+					$dispatcher->url($request, ROUTE_COMPONENT, null, 'modals.editorDecision.EditorDecisionHandler', $action['operation'], null, $actionArgs),
+					$action['title']),
 				$action['title'],
-				null,
 				(isset($action['image']) ? $action['image'] : null)
 			);
 		}

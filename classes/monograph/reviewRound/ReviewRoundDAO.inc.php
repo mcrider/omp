@@ -206,7 +206,7 @@ class ReviewRoundDAO extends DAO {
 				rr.review_type, rr.round as round
 			FROM review_rounds rr
 				INNER JOIN review_round_files rrf
-					ON rr.review_type = rrf.review_type AND rr.round = rrf.round AND
+					ON rr.review_type = rrf.review_type AND rr.round = rrf.round
 				INNER JOIN monograph_files mf
 					ON rr.submission_id = mf.monograph_id AND rrf.file_id = mf.file_id
 				LEFT JOIN monograph_artwork_files af ON mf.file_id = af.file_id AND mf.revision = af.revision
@@ -270,8 +270,6 @@ class ReviewRoundDAO extends DAO {
 	 * @return array MonographFiles
 	 */
 	function &getRevisionsOfCurrentReviewFiles($monographId, $round) {
-		$returner = array();
-
 		// Get the maximum revision of each file in the review_round_files table; This is needed to avoid nested selects
 		$maxRevisions = $this->retrieve(
 			'SELECT rrf.file_id, MAX(revision) as revision
@@ -289,11 +287,11 @@ class ReviewRoundDAO extends DAO {
 			$maxRevisions->MoveNext();
 		}
 
+		// Get all files attached to this monograph to compare against those in the review_round_files table
 		$result =& $this->retrieve(
 			'SELECT
-				mf.file_id AS monograph_file_id, mf.revision AS monograph_revision,
-				af.file_id AS artwork_file_id, af.revision AS artwork_revision,
-				mf.*, af.*,
+				mf.file_id AS monograph_file_id, mf.revision as monograph_revision,
+				mf.*,
 				rrf.review_type, rrf.round as round
 			FROM review_round_files rrf
 				INNER JOIN monograph_files mf ON rrf.file_id = mf.file_id AND rrf.revision < mf.revision
@@ -302,9 +300,10 @@ class ReviewRoundDAO extends DAO {
 			array((int) $monographId, (int) $round)
 		);
 
+		$returner = array();
 		while (!$result->EOF) {
 			$row = $result->GetRowAssoc(false);
-			if($maxRevision[$row['file_id']] < $row['revision']) $returner[] =& $this->_submissionFileDao->fromRow($row);
+			if($maxRevision[(int)$row['file_id']] < (int)$row['revision']) $returner[] =& $this->_submissionFileDao->fromRow($row);
 			$result->MoveNext();
 		}
 

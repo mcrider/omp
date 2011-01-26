@@ -16,15 +16,15 @@
 import('lib.pkp.classes.controllers.grid.GridHandler');
 
 // import submission files grid specific classes
-import('controllers.grid.files.submission.SubmissionFilesGridHandler');
+import('controllers.grid.files.SubmissionFilesGridHandler');
 
 class SubmissionDetailsFilesGridHandler extends SubmissionFilesGridHandler {
 	/**
 	 * Constructor
 	 * @param $canAdd boolean Whether to show the 'add files' grid action
 	 */
-	function SubmissionDetailsFilesGridHandler($canAdd = false) {
-		parent::SubmissionFilesGridHandler(MONOGRAPH_FILE_SUBMISSION, $canAdd);
+	function SubmissionDetailsFilesGridHandler($canAdd = true, $revisionOnly = false, $isSelectable = false, $canDownloadAll = false) {
+		parent::SubmissionFilesGridHandler(MONOGRAPH_FILE_SUBMISSION, $canAdd, $revisionOnly, $isSelectable, $canDownloadAll);
 
 		$this->addRoleAssignment(
 				array(ROLE_ID_AUTHOR, ROLE_ID_SERIES_EDITOR, ROLE_ID_PRESS_MANAGER),

@@ -13,7 +13,7 @@
  */
 
 // import submission files grid specific classes
-import('controllers.grid.files.submission.SubmissionFilesGridHandler');
+import('controllers.grid.files.SubmissionFilesGridHandler');
 
 class SubmissionReviewFilesGridHandler extends SubmissionFilesGridHandler {
 	/**

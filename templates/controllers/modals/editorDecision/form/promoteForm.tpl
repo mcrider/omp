@@ -55,8 +55,14 @@
 	</div>
 
 	<div id="availableFiles">
-		{url|assign:newRoundRevisionsUrl router=$smarty.const.ROUTE_COMPONENT component="grid.files.submission.RevisionsGridHandler" op="fetchGrid" monographId=$monographId reviewType=$currentReviewType round=$round isSelectable=1 escape=false}
-		{load_url_in_div id="newRoundRevisionsGrid" url=$newRoundRevisionsUrl}
+		{* Show a different grid depending on whether we're in review or before the review stage *}
+		{if $stageId == $smarty.const.WORKFLOW_STAGE_ID_SUBMISSION}
+			{url|assign:filesForReviewUrl router=$smarty.const.ROUTE_COMPONENT component="grid.files.submission.SelectableSubmissionDetailsFilesGridHandler" op="fetchGrid" monographId=$monographId reviewType=$currentReviewType round=$round isSelectable=1 escape=false}
+			{load_url_in_div id="filesForReviewGrid" url=$filesForReviewUrl}
+		{else}
+			{url|assign:filesForReviewUrl router=$smarty.const.ROUTE_COMPONENT component="grid.files.review.ReviewRevisionsGridHandler" op="fetchGrid" monographId=$monographId reviewType=$currentReviewType round=$round isSelectable=1 escape=false}
+			{load_url_in_div id="filesForReviewGrid" url=$filesForReviewUrl}
+		{/if}
 	</div>
 </form>
 

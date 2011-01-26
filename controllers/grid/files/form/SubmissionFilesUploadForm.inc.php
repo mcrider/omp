@@ -13,7 +13,7 @@
  */
 
 
-import('controllers.grid.files.submissionFiles.form.SubmissionFilesUploadBaseForm');
+import('controllers.grid.files.form.SubmissionFilesUploadBaseForm');
 
 class SubmissionFilesUploadForm extends SubmissionFilesUploadBaseForm {
 	/**

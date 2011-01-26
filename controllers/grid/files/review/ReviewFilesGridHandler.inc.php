@@ -12,59 +12,73 @@
  * @brief Handle the editor review file selection grid (selects which files to send to review)
  */
 
-import('lib.pkp.classes.controllers.grid.GridHandler');
+// Import submission files grid base class
+import('controllers.grid.files.SubmissionFilesGridHandler');
 
-class ReviewFilesGridHandler extends GridHandler {
-	/** the FileType for this grid */
-	var $fileType;
+// import UI base classes
+import('lib.pkp.classes.linkAction.request.AjaxAction');
 
-	/** Boolean flag if grid is selectable **/
-	var $_isSelectable;
+class ReviewFilesGridHandler extends SubmissionFilesGridHandler {
+	/** @var boolean */
+	var $_canManage;
 
-	/** Boolean flag if user can upload file to grid **/
-	var $_canUpload;
+	/** @var int */
+	var $_reviewType;
+
+	/** @var int */
+	var $_round;
 
 	/**
 	 * Constructor
 	 */
-	function ReviewFilesGridHandler() {
-		parent::GridHandler();
+	function ReviewFilesGridHandler($canAdd = false, $isSelectable = false, $canDownloadAll = false, $canManage = true) {
+		$this->_canManage = $canManage;
 
+		parent::SubmissionFilesGridHandler(MONOGRAPH_FILE_REVIEW, $canAdd, false, $isSelectable, $canDownloadAll);
 	}
 
 	//
 	// Getters/Setters
 	//
+
 	/**
-	 * Set the selectable flag
-	 * @param $isSelectable bool
+	 * Whether the grid allows file management (select existing files to add to grid)
+	 * @return boolean
 	 */
-	function setIsSelectable($isSelectable) {
-		$this->_isSelectable = $isSelectable;
+	function canManage() {
+		return $this->_canManage;
 	}
 
 	/**
-	 * Get the selectable flag
-	 * @return bool
+	 * Set the round number
+	 * @param $round int
 	 */
-	function getIsSelectable() {
-		return $this->_isSelectable;
+	function setRound($round) {
+	    $this->_round = $round;
 	}
 
 	/**
-	 * Set the canUpload flag
-	 * @param $canUpload bool
+	 * Get the round number
+	 * @return int
 	 */
-	function setCanUpload($canUpload) {
-		$this->_canUpload = $canUpload;
+	function getRound() {
+	    return $this->_round;
 	}
 
 	/**
-	 * Get the canUpload flag
-	 * @return bool
+	 * Set the review type
+	 * @param $reviewType int
 	 */
-	function getCanUpload() {
-		return $this->_canUpload;
+	function setReviewType($reviewType) {
+	    $this->_reviewType = $reviewType;
+	}
+
+	/**
+	 * Get the review type
+	 * @return int
+	 */
+	function getReviewType() {
+	    return $this->_reviewType;
 	}
 
 
@@ -76,188 +90,67 @@ class ReviewFilesGridHandler extends GridHandler {
 	 * @param $request PKPRequest
 	 */
 	function initialize(&$request) {
-		parent::initialize($request);
-		// Basic grid configuration
-		$monographId = (integer)$request->getUserVar('monographId');
-		$this->setId('reviewFiles');
-		$this->setTitle('reviewer.monograph.reviewFiles');
-
-		// Set the Is Selectable boolean flag
-		$isSelectable = (boolean)$request->getUserVar('isSelectable');
-		$this->setIsSelectable($isSelectable);
-
-		// Set the Can upload boolean flag
-		$canUpload = (boolean)$request->getUserVar('canUpload');
-		$this->setCanUpload($canUpload);
-
 		$reviewType = (int)$request->getUserVar('reviewType');
 		$round = (int)$request->getUserVar('round');
+		assert(!empty($reviewType) && !empty($round));
+		$this->setReviewType($reviewType);
+		$this->setRound($round);
 
-		// Check if the user can add files to the round
-		$canAdd = (boolean)$request->getUserVar('canAdd');
+		// Load monograph files.
+		$monograph =& $this->getMonograph();
+		$this->loadMonographFiles($monograph);
 
-		// Grab the files that are currently set for the review
-		$reviewRoundDAO =& DAORegistry::getDAO('ReviewRoundDAO');
-		$selectedFiles =& $reviewRoundDAO->getReviewFilesByRound($monographId);
+		if($this->canManage()) {
+			$router =& $request->getRouter();
+				$this->addAction(
+					new LinkAction(
+						'manageReviewFiles',
+						new AjaxModal(
+							$router->url($request, null, null, 'manageReviewFiles', null, array('monographId' => $monograph->getId(), 'reviewType' => $this->getReviewType(), 'round' => $this->getRound())),
+							'editor.submissionArchive.manageReviewFiles'
+						),
+						'editor.submissionArchive.manageReviewFiles',
+						'add'
+					)
+				);
+		}
 
+		import('controllers.grid.files.SubmissionFilesGridCellProvider');
+		$cellProvider =& new SubmissionFilesGridCellProvider();
+		parent::initialize($request, $cellProvider);
+
+		// Load additional locale components
 		Locale::requireComponents(array(LOCALE_COMPONENT_PKP_COMMON, LOCALE_COMPONENT_APPLICATION_COMMON, LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_OMP_EDITOR, LOCALE_COMPONENT_OMP_SUBMISSION));
 
-		// Elements to be displayed in the grid
-		$router =& $request->getRouter();
-		$context =& $router->getContext($request);
-
-		// Do different initialization if this is a selectable grid or if its a display only version of the grid.
-		if ( $isSelectable ) {
-			// Load a different grid template
-			$this->setTemplate('controllers/grid/files/reviewFiles/grid.tpl');
-
-			// Set the files to all the available files to allow selection.
-			$submissionFileDao =& DAORegistry::getDAO('SubmissionFileDAO'); /* @var $submissionFileDao SubmissionFileDAO */
-			$monographFiles =& $submissionFileDao->getLatestRevisions($monographId);
-			$this->setData($monographFiles);
-			$this->setId('reviewFilesSelect'); // Need a unique ID since the 'manage review files' modal is in the same namespace as the 'view review files' modal
-
-			// Set the already selected elements of the grid
-			$templateMgr =& TemplateManager::getManager();
-			$selectedRevisions =& $reviewRoundDAO->getReviewFilesAndRevisionsByRound($monographId, $round, true);
-			$templateMgr->assign('selectedFileIds', $selectedRevisions);
-		} else {
-			// set the grid data to be only the files that have already been selected
-			$data = isset($selectedFiles[$reviewType][$round]) ? $selectedFiles[$reviewType][$round] : array();
-			$this->setData($data);
-		}
-
-		// Test whether the tar binary is available for the export to work, if so, add grid action
-		$tarBinary = Config::getVar('cli', 'tar');
-		$params = array('monographId' => $monographId, 'reviewType' => $reviewType, 'round' => $round, 'fileStage' => MONOGRAPH_FILE_REVIEW);
-		if (isset($this->_data) && !empty($tarBinary) && file_exists($tarBinary)) {
-			$this->addAction(
-				new LegacyLinkAction(
-					'downloadAll',
-					LINK_ACTION_MODE_LINK,
-					LINK_ACTION_TYPE_NOTHING,
-					$router->url($request, null, null, 'downloadAllFiles', null, $params),
-					'submission.files.downloadAll',
-					null,
-					'getPackage'
-				)
-			);
-		}
-
-		if ($canAdd) {
-			$this->addAction(
-				new LegacyLinkAction(
-					'manageReviewFiles',
-					LINK_ACTION_MODE_MODAL,
-					LINK_ACTION_TYPE_REPLACE,
-					$router->url($request, null, null, 'manageReviewFiles', null, $params),
-					'editor.submissionArchive.manageReviewFiles',
-					null,
-					'add'
-				)
-			);
-		}
-
-		if ($canUpload) {
-			$this->addAction(
-				new LegacyLinkAction(
-					'uploadReviewFile',
-					LINK_ACTION_MODE_MODAL,
-					LINK_ACTION_TYPE_APPEND,
-					$router->url($request, null, 'grid.files.submission.SubmissionReviewFilesGridHandler', 'addFile', null, $params),
-					'editor.submissionArchive.uploadFile',
-					null,
-					'add'
-				)
-			);
-		}
-
-		import('controllers.grid.files.review.ReviewFilesGridCellProvider');
-		$cellProvider =& new ReviewFilesGridCellProvider();
-		// Columns
-		if ($this->getIsSelectable()) {
-			$this->addColumn(new GridColumn('select',
-				'common.select',
-				null,
-				'controllers/grid/gridRowSelectInput.tpl',
-				$cellProvider)
-			);
-		}
-
-		$this->addColumn(new GridColumn('name',
-			'common.file',
-			null,
-			'controllers/grid/gridCell.tpl',
-			$cellProvider)
-		);
-
-		// Show the file type.
-		$this->addColumn(new GridColumn('type',
-			'common.type',
-			null,
-			'controllers/grid/gridCell.tpl',
-			$cellProvider)
-		);
+		$this->addColumn(new GridColumn('type', 'common.type', null, 'controllers/grid/gridCell.tpl', $cellProvider));
 	}
+
 
 	//
-	// Public methods
+	// Protected methods
 	//
-	/**
-	 * Download the monograph file
-	 * @param $args array
-	 * @param $request PKPRequest
-	 * @return string Serialized JSON object
-	 */
-	function downloadFile($args, &$request) {
-		$monographId = $request->getUserVar('monographId');
-		$fileId = $request->getUserVar('fileId');
 
-		import('classes.file.MonographFileManager');
-		MonographFileManager::downloadFile($monographId, $fileId);
+	/**
+	 * Select the files to load in the grid
+	 * @see SubmissionFilesGridHandler::loadMonographFiles()
+	 */
+	function loadMonographFiles() {
+		$monograph =& $this->getMonograph();
+		// Grab the files that are currently set for the review
+		$reviewRoundDAO =& DAORegistry::getDAO('ReviewRoundDAO');
+		$monographFiles =& $reviewRoundDAO->getReviewFilesByRound($monograph->getId());
+		$rowData = array();
+		if(isset($monographFiles[$this->getReviewType()][$this->getRound()])) {
+			$rowData = $monographFiles[$this->getReviewType()][$this->getRound()];
+		}
+		$this->setData($rowData);
 	}
 
-	/**
-	 * Download all of the monograph files as one compressed file
-	 * @param $args array
-	 * @param $request PKPRequest
-	 * @return string Serialized JSON object
-	 */
-	function downloadAllFiles($args, &$request) {
-		$monographId = $request->getUserVar('monographId');
-
-		import('classes.file.MonographFileManager');
-		MonographFileManager::downloadFilesArchive($monographId, $this->getData());
-	}
-
-	/**
-	 * Add a file that the Press Editor did not initally add to the review
-	 * @param $args array
-	 * @param $request PKPRequest
-	 * @return string Serialized JSON object
-	 */
 	function manageReviewFiles($args, &$request) {
-		$monographId = $request->getUserVar('monographId');
+		$monograph =& $this->getMonograph();
 
-		import('controllers.grid.files.reviewFiles.form.ManageReviewFilesForm');
-		$manageReviewFilesForm = new ManageReviewFilesForm($monographId);
-
-		$manageReviewFilesForm->initData($args, $request);
-		$json = new JSON('true', $manageReviewFilesForm->fetch($request));
-		return $json->getString();
-	}
-
-	/**
-	 * Allow the editor to upload a new file
-	 * @param $args array
-	 * @param $request PKPRequest
-	 * @return string Serialized JSON object
-	 */
-	function uploadReviewFile($args, &$request) {
-		$monographId = $request->getUserVar('monographId');
-
-		import('controllers.grid.files.reviewFiles.form.ManageReviewFilesForm');
-		$manageReviewFilesForm = new ManageReviewFilesForm($monographId);
+		import('controllers.grid.files.review.form.ManageReviewFilesForm');
+		$manageReviewFilesForm = new ManageReviewFilesForm($monograph->getId(), $this->getReviewType(), $this->getRound());
 
 		$manageReviewFilesForm->initData($args, $request);
 		$json = new JSON('true', $manageReviewFilesForm->fetch($request));
@@ -271,37 +164,26 @@ class ReviewFilesGridHandler extends GridHandler {
 	 * @return string Serialized JSON object
 	 */
 	function updateReviewFiles($args, &$request) {
-		$monographId = $request->getUserVar('monographId');
+		$monograph =& $this->getMonograph();
 
-		import('controllers.grid.files.reviewFiles.form.ManageReviewFilesForm');
-		$manageReviewFilesForm = new ManageReviewFilesForm($monographId);
+		import('controllers.grid.files.review.form.ManageReviewFilesForm');
+		$manageReviewFilesForm = new ManageReviewFilesForm($monograph->getId(), $this->getReviewType(), $this->getRound());
 
 		$manageReviewFilesForm->readInputData();
 
 		if ($manageReviewFilesForm->validate()) {
 			$selectedFiles =& $manageReviewFilesForm->execute($args, $request);
 
-			// Re-render the grid with the updated files
-			$this->setData($selectedFiles);
-			$this->initialize($request);
-
-			// Pass to modal.js to reload the grid with the new content
-			// FIXME: Calls to private methods of superclasses are not allowed!
-			$gridBodyParts = $this->_renderGridBodyPartsInternally($request);
-			if (count($gridBodyParts) == 0) {
-				// The following should usually be returned from a
-				// template also so we remain view agnostic. But as this
-				// is easy to migrate and we want to avoid the additional
-				// processing overhead, let's just return plain HTML.
-				$renderedGridRows = '<tbody> </tbody>';
-			} else {
-				assert(count($gridBodyParts) == 1);
-				$renderedGridRows = $gridBodyParts[0];
-			}
-			$json = new JSON('true', $renderedGridRows);
+			return $this->elementAdded($selectedFiles);
 		} else {
 			$json = new JSON('false');
+			return $json->getString();
 		}
-		return $json->getString();
 	}
+
+
+	function deleteFile($args, $request) {
+		// call parent, also delete from review round tables
+	}
+
 }

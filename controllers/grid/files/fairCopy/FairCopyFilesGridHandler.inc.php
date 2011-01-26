@@ -23,7 +23,7 @@ class FairCopyFilesGridHandler extends SubmissionFilesGridHandler {
 	 */
 	function FairCopyFilesGridHandler() {
 		// Configure the submission file grid.
-		parent::SubmissionFilesGridHandler(MONOGRAPH_FILE_FAIR_COPY, true);
+		parent::SubmissionFilesGridHandler(MONOGRAPH_FILE_FAIR_COPY, true, false, false, true);
 
 		// Configure role based authorization.
 		$this->addRoleAssignment(array(ROLE_ID_SERIES_EDITOR, ROLE_ID_PRESS_MANAGER, ROLE_ID_PRESS_ASSISTANT),
@@ -55,22 +55,6 @@ class FairCopyFilesGridHandler extends SubmissionFilesGridHandler {
 
 		// Load grid data.
 		$this->loadMonographFiles();
-
-		// Test whether the tar binary is available for the export to work, if so, add grid action
-		$tarBinary = Config::getVar('cli', 'tar');
-		if ($this->hasData() && !empty($tarBinary) && file_exists($tarBinary)) {
-			$monograph =& $this->getMonograph();
-			$router =& $request->getRouter();
-			$this->addAction(
-				new LinkAction(
-					'downloadAll',
-					new RedirectAction($router->url($request, null, null, 'downloadAllFiles', null,
-							array('monographId' => $monograph->getId()))),
-					'submission.files.downloadAll',
-					'getPackage'
-				)
-			);
-		}
 
 		// Load additional translation components.
 		Locale::requireComponents(array(LOCALE_COMPONENT_OMP_EDITOR));

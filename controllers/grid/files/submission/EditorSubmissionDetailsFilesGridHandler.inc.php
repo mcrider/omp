@@ -18,10 +18,9 @@ import('controllers.grid.files.submission.SubmissionDetailsFilesGridHandler');
 class EditorSubmissionDetailsFilesGridHandler extends SubmissionDetailsFilesGridHandler {
 	/**
 	 * Constructor
-	 * @param $canAdd boolean Whether to show the 'add files' grid action
 	 */
-	function EditorSubmissionDetailsFilesGridHandler($canAdd = false) {
-		parent::SubmissionDetailsFilesGridHandler(true);
+	function EditorSubmissionDetailsFilesGridHandler() {
+		parent::SubmissionDetailsFilesGridHandler(true, false, false, true);
 	}
 
 }

@@ -1,13 +1,13 @@
 <?php
 
 /**
- * @file controllers/grid/submissions/pressEditor/form/ManageReviewFilesForm.inc.php
+ * @file controllers/grid/files/review/form/ManageReviewFilesForm.inc.php
  *
  * Copyright (c) 2003-2008 John Willinsky
  * Distributed under the GNU GPL v2. For full terms see the file docs/COPYING.
  *
  * @class ManageReviewFilesForm
- * @ingroup controllers_grid_files_reviewFiles_form
+ * @ingroup controllers_grid_files_review_form
  *
  * @brief Form for add or removing files from a review
  */
@@ -15,17 +15,78 @@
 import('lib.pkp.classes.form.Form');
 
 class ManageReviewFilesForm extends Form {
-	/** The monograph associated with the submission contributor being edited **/
+	/** @var int **/
 	var $_monographId;
+
+	/** @var int **/
+	var $_reviewType;
+
+	/** @var int **/
+	var $_round;
+
 
 	/**
 	 * Constructor.
 	 */
-	function ManageReviewFilesForm($monographId) {
+	function ManageReviewFilesForm($monographId, $reviewType, $round) {
 		parent::Form('controllers/grid/files/reviewFiles/manageReviewFiles.tpl');
-		$this->_monographId = (int) $monographId;
+		$this->setMonographId((int)$monographId);
+		$this->setReviewType((int)$reviewType);
+		$this->setRound((int)$round);
 
 		$this->addCheck(new FormValidatorPost($this));
+	}
+
+
+	//
+	// Getters / Setters
+	//
+	/**
+	 * Set the monograph id
+	 * @param $monographId int
+	 */
+	function setMonographId($monographId) {
+	    $this->_monographId = $monographId;
+	}
+
+	/**
+	 * Get the monograph id
+	 * @return int
+	 */
+	function getMonographId() {
+	    return $this->_monographId;
+	}
+
+	/**
+	 * Set the review type
+	 * @param $reviewType int
+	 */
+	function setReviewType($reviewType) {
+	    $this->_reviewType = $reviewType;
+	}
+
+	/**
+	 * Get the review type
+	 * @return int
+	 */
+	function getReviewType() {
+	    return $this->_reviewType;
+	}
+
+	/**
+	 * Set the round
+	 * @param $round int
+	 */
+	function setRound($round) {
+	    $this->_round = $round;
+	}
+
+	/**
+	 * Get the round
+	 * @return int
+	 */
+	function getRound() {
+	    return $this->_round;
 	}
 
 
@@ -51,7 +112,7 @@ class ManageReviewFilesForm extends Form {
 	 * @see Form::readInputData()
 	 */
 	function readInputData() {
-		$this->readUserVars(array('reviewType', 'round', 'selectedFiles'));
+		$this->readUserVars(array('selectedFiles'));
 	}
 
 	/**
@@ -60,10 +121,10 @@ class ManageReviewFilesForm extends Form {
 	 * @param $request PKPRequest
 	 */
 	function &execute($args, &$request) {
-		$reviewType = (integer)$this->getData('reviewType');
-		$round = (integer)$this->getData('round');
-
 		$selectedFiles = $this->getData('selectedFiles');
+		$reviewType = $this->getReviewType();
+		$round = $this->getRound();
+
 		$filesWithRevisions = array();
 		if (!empty($selectedFiles)) {
 			foreach ($selectedFiles as $selectedFile) {
@@ -71,10 +132,10 @@ class ManageReviewFilesForm extends Form {
 			}
 		}
 		$reviewRoundDAO =& DAORegistry::getDAO('ReviewRoundDAO');
-		$reviewRoundDAO->setFilesForReview($this->_monographId, $reviewType, $round, $filesWithRevisions);
+		$reviewRoundDAO->setFilesForReview($this->getMonographId(), $reviewType, $round, $filesWithRevisions);
 
 		// Return the files that are currently set for the review
-		$reviewFilesByRound =& $reviewRoundDAO->getReviewFilesByRound($this->_monographId);
+		$reviewFilesByRound =& $reviewRoundDAO->getReviewFilesByRound($this->getMonographId());
 		if (isset($reviewFilesByRound[$reviewType][$round])) {
 			return $reviewFilesByRound[$reviewType][$round];
 		} else {

@@ -189,11 +189,11 @@ class AuthorCopyeditingFilesGridHandler extends GridHandler {
 		switch ($genre->getCategory()) {
 			// FIXME: Need a way to determine artwork file type from user-specified artwork file types
 			case GENRE_CATEGORY_ARTWORK:
-				import('controllers.grid.files.submissionFiles.form.SubmissionFilesArtworkMetadataForm');
+				import('controllers.grid.files.form.SubmissionFilesArtworkMetadataForm');
 				$metadataForm = new SubmissionFilesArtworkMetadataForm($fileId, $signoffId);
 				break;
 			default:
-				import('controllers.grid.files.submissionFiles.form.SubmissionFilesMetadataForm');
+				import('controllers.grid.files.form.SubmissionFilesMetadataForm');
 				$metadataForm = new SubmissionFilesMetadataForm($fileId, $signoffId);
 				break;
 		}
@@ -231,11 +231,11 @@ class AuthorCopyeditingFilesGridHandler extends GridHandler {
 		switch ($genre->getCategory()) {
 			// FIXME: Need a way to determine artwork file type from user-specified artwork file types
 			case GENRE_CATEGORY_ARTWORK:
-				import('controllers.grid.files.submissionFiles.form.SubmissionFilesArtworkMetadataForm');
+				import('controllers.grid.files.form.SubmissionFilesArtworkMetadataForm');
 				$metadataForm = new SubmissionFilesArtworkMetadataForm($fileId);
 				break;
 			default:
-				import('controllers.grid.files.submissionFiles.form.SubmissionFilesMetadataForm');
+				import('controllers.grid.files.form.SubmissionFilesMetadataForm');
 				$metadataForm = new SubmissionFilesMetadataForm($fileId);
 				break;
 		}

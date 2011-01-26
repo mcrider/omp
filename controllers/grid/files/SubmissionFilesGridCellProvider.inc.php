@@ -88,6 +88,10 @@ class SubmissionFilesGridCellProvider extends DataObjectGridCellProvider {
 				$genre = $genreDao->getById($monographFile->getGenreId());
 				return array('label' => $genre->getLocalizedName());
 				break;
+			case 'select':
+				$flags = $column->getFlags();
+				$selectedFileIds = isset($flags['selectedFileIds']) ? $flags['selectedFileIds'] : array();
+				return array('rowId' => $monographFile->getFileId() . "-" . $monographFile->getRevision(), 'selectedFileIds' => $selectedFileIds);
 		}
 	}
 }

@@ -12,7 +12,7 @@
  * @brief Form for editing artwork file metadata.
  */
 
-import('controllers.grid.files.submissionFiles.form.SubmissionFilesMetadataForm');
+import('controllers.grid.files.form.SubmissionFilesMetadataForm');
 
 class SubmissionFilesArtworkMetadataForm extends SubmissionFilesMetadataForm {
 	/**

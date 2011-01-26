@@ -19,11 +19,12 @@ class EditorReviewFilesGridHandler extends ReviewFilesGridHandler {
 	/**
 	 * Constructor
 	 */
-	function EditorReviewFilesGridHandler() {
-		parent::ReviewFilesGridHandler();
+	function EditorReviewFilesGridHandler($canAdd = false, $isSelectable = false, $canManage = true) {
+		parent::ReviewFilesGridHandler($canAdd, $isSelectable, true, $canManage);
 
 		$this->addRoleAssignment(array(ROLE_ID_SERIES_EDITOR, ROLE_ID_PRESS_MANAGER),
-				array('fetchGrid', 'downloadFile', 'downloadAllFiles', 'manageReviewFiles',	'uploadReviewFile', 'updateReviewFiles'));
+				array('fetchGrid', 'downloadFile', 'downloadAllFiles', 'manageReviewFiles',
+					 'uploadReviewFile', 'updateReviewFiles'));
 	}
 
 

@@ -20,6 +20,7 @@ define('SUBMISSION_MIN_SIMILARITY_OF_REVISION', 70);
 // Import UI base classes.
 import('lib.pkp.classes.controllers.grid.GridHandler');
 import('lib.pkp.classes.linkAction.request.WizardModal');
+import('lib.pkp.classes.linkAction.request.RedirectAction');
 
 // Import submission files grid specific classes.
 import('controllers.grid.files.SubmissionFilesGridRow');
@@ -38,22 +39,35 @@ class SubmissionFilesGridHandler extends GridHandler {
 	/** @var boolean */
 	var $_revisionOnly;
 
+	/** @var boolean */
+	var $_canDownloadAll;
+
+	/** @var array */
+	var $_selectedFileIds;
+
 	/**
 	 * Constructor
 	 * @param $fileStage integer the workflow stage
 	 *  file storage that this grid operates on. One of
 	 *  the MONOGRAPH_FILE_* constants.
-	 * @param $canAdd boolen whether the grid will contain
+	 * @param $canAdd boolean whether the grid will contain
 	 *  an "add file" button.
 	 * @param $revisionOnly boolean whether this grid
 	 *  allows uploading of revisions only or whether also
 	 *  new files can be uploaded.
+	 * @param $isSelectable boolean whether this grid displays
+	 *  checkboxes on each grid row that allows files to be selected
+	 *  as form inputs
+	 * @param $canDownloadAll boolean whether the user can download
+	 *  all files in the grid as a compressed file
 	 */
-	function SubmissionFilesGridHandler($fileStage, $canAdd = true, $revisionOnly = false) {
+	function SubmissionFilesGridHandler($fileStage, $canAdd = true, $revisionOnly = false, $isSelectable = false, $canDownloadAll = false) {
 		assert(is_numeric($fileStage) && $fileStage > 0);
 		$this->_fileStage = (int)$fileStage;
 		$this->_canAdd = (boolean)$canAdd;
 		$this->_revisionOnly = (boolean)$revisionOnly;
+		$this->_isSelectable = (boolean)$isSelectable;
+		$this->_canDownloadAll = (boolean)$canDownloadAll;
 
 		parent::GridHandler();
 	}
@@ -100,6 +114,38 @@ class SubmissionFilesGridHandler extends GridHandler {
 		return $this->_revisionOnly;
 	}
 
+	/**
+	 * Does this grid have a checkbox column?
+	 * @return boolean
+	 */
+	function isSelectable() {
+		return $this->_isSelectable;
+	}
+
+	/**
+	 * Set the selected file IDs
+	 * @param $selectedFileIds array
+	 */
+	function setSelectedFileIds($selectedFileIds) {
+	    $this->_selectedFileIds = $selectedFileIds;
+	}
+
+	/**
+	 * Get the selected file IDs
+	 * @return array
+	 */
+	function getSelectedFileIds() {
+	    return $this->_selectedFileIds;
+	}
+
+
+	/**
+	 * Can the user download all files as an archive?
+	 * @return boolean
+	 */
+	function canDownloadAll() {
+		return $this->_canDownloadAll;
+	}
 
 	//
 	// Implement template methods from PKPHandler
@@ -109,14 +155,14 @@ class SubmissionFilesGridHandler extends GridHandler {
 	 */
 	function initialize(&$request, &$cellProvider) {
 		parent::initialize($request);
+		$router =& $request->getRouter();
+		$monograph =& $this->getMonograph();
 
 		// Load translations.
 		Locale::requireComponents(array(LOCALE_COMPONENT_OMP_SUBMISSION, LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_PKP_COMMON, LOCALE_COMPONENT_APPLICATION_COMMON));
 
 		// Add grid-level actions.
 		if($this->canAdd()) {
-			$router =& $request->getRouter();
-			$monograph =& $this->getMonograph();
 			$actionArgs = array('monographId' => $monograph->getId());
 			$this->addAction(
 				new LinkAction(
@@ -128,6 +174,30 @@ class SubmissionFilesGridHandler extends GridHandler {
 					),
 					$this->revisionOnly() ? 'submission.addRevision' : 'submission.addFile',
 					'add'
+				)
+			);
+		}
+
+		if($this->isSelectable()) {
+			$this->addColumn(new GridColumn('select',
+				'common.select',
+				null,
+				'controllers/grid/gridRowSelectInput.tpl',
+				$cellProvider,
+				array('selectedFileIds' => $this->getSelectedFileIds())
+			));
+		}
+
+		// Test whether the tar binary is available for the export to work, if so, add 'download all' grid action
+		$tarBinary = Config::getVar('cli', 'tar');
+		if ($this->canDownloadAll() && !empty($tarBinary) && file_exists($tarBinary) && isset($this->_data)) {
+			$this->addAction(
+				new LinkAction(
+					'downloadAll',
+					new RedirectAction($router->url($request, null, null, 'downloadAllFiles', null,
+							array('monographId' => $monograph->getId()))),
+					'submission.files.downloadAll',
+					'getPackage'
 				)
 			);
 		}
@@ -196,7 +266,7 @@ class SubmissionFilesGridHandler extends GridHandler {
 	 */
 	function displayFileUploadForm($args, &$request) {
 		// Instantiate, configure and initialize the form.
-		import('controllers.grid.files.submissionFiles.form.SubmissionFilesUploadForm');
+		import('controllers.grid.files.form.SubmissionFilesUploadForm');
 		$monograph =& $this->getMonograph();
 		$revisedFileId = $this->_getRevisedFileIdFromRequest($request);
 		$fileForm = new SubmissionFilesUploadForm($request, $monograph->getId(), $this->getFileStage(), $this->revisionOnly(), $revisedFileId);
@@ -216,7 +286,7 @@ class SubmissionFilesGridHandler extends GridHandler {
 	function uploadFile($args, &$request) {
 		// Instantiate the file upload form.
 		$monograph =& $this->getMonograph();
-		import('controllers.grid.files.submissionFiles.form.SubmissionFilesUploadForm');
+		import('controllers.grid.files.form.SubmissionFilesUploadForm');
 		$uploadForm = new SubmissionFilesUploadForm($request, $monograph->getId(), $this->getFileStage(), $this->revisionOnly());
 		$uploadForm->readInputData();
 
@@ -231,7 +301,7 @@ class SubmissionFilesGridHandler extends GridHandler {
 					$revisedFileId = $this->_checkForRevision($uploadedFile, $uploadForm->getMonographFiles());
 					if ($revisedFileId) {
 						// Instantiate the revision confirmation form.
-						import('controllers.grid.files.submissionFiles.form.SubmissionFilesUploadConfirmationForm');
+						import('controllers.grid.files.form.SubmissionFilesUploadConfirmationForm');
 						$confirmationForm = new SubmissionFilesUploadConfirmationForm($request, $monograph->getId(), $this->getFileStage(), $revisedFileId, $uploadedFile);
 						$confirmationForm->initData($args, $request);
 
@@ -262,7 +332,7 @@ class SubmissionFilesGridHandler extends GridHandler {
 	function confirmRevision($args, &$request) {
 		// Instantiate the revision confirmation form.
 		$monograph =& $this->getMonograph();
-		import('controllers.grid.files.submissionFiles.form.SubmissionFilesUploadConfirmationForm');
+		import('controllers.grid.files.form.SubmissionFilesUploadConfirmationForm');
 		$confirmationForm = new SubmissionFilesUploadConfirmationForm($request, $monograph->getId(), $this->getFileStage());
 		$confirmationForm->readInputData();
 
@@ -466,10 +536,10 @@ class SubmissionFilesGridHandler extends GridHandler {
 
 		// Import the meta-data form based on the file implementation.
 		if (is_a($monographFile, 'ArtworkFile')) {
-			import('controllers.grid.files.submissionFiles.form.SubmissionFilesArtworkMetadataForm');
+			import('controllers.grid.files.form.SubmissionFilesArtworkMetadataForm');
 			$metadataForm = new SubmissionFilesArtworkMetadataForm($monographFile);
 		} else {
-			import('controllers.grid.files.submissionFiles.form.SubmissionFilesMetadataForm');
+			import('controllers.grid.files.form.SubmissionFilesMetadataForm');
 			$metadataForm = new SubmissionFilesMetadataForm($monographFile);
 		}
 

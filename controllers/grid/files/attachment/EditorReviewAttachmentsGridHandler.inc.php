@@ -144,7 +144,7 @@ class EditorReviewAttachmentsGridHandler extends ReviewAttachmentsGridHandler {
 		$monographId = $request->getUserVar('monographId');
 		$fileId = $request->getUserVar('rowId');
 
-		import('controllers.grid.files.reviewAttachments.form.EditorReviewAttachmentsForm');
+		import('controllers.grid.files.attachment.form.EditorReviewAttachmentsForm');
 		$reviewAttachmentsForm = new EditorReviewAttachmentsForm($monographId, $fileId, $this->getId());
 
 		if ($reviewAttachmentsForm->isLocaleResubmit()) {
@@ -166,7 +166,7 @@ class EditorReviewAttachmentsGridHandler extends ReviewAttachmentsGridHandler {
 		$router =& $request->getRouter();
 		$monographId = $request->getUserVar('monographId');
 
-		import('controllers.grid.files.reviewAttachments.form.EditorReviewAttachmentsForm');
+		import('controllers.grid.files.attachment.form.EditorReviewAttachmentsForm');
 		$reviewAttachmentsForm = new EditorReviewAttachmentsForm($monographId, null, $this->getId());
 		$reviewAttachmentsForm->readInputData();
 

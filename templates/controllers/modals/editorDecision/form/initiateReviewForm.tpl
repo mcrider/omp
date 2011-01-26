@@ -15,8 +15,8 @@
 	<input type="hidden" name="monographId" value="{$monographId|escape}" />
 
 	<!-- Available submission files -->
-	{url|assign:availableReviewFilesGridUrl router=$smarty.const.ROUTE_COMPONENT component="grid.files.review.EditorReviewFilesGridHandler" stageId=$smarty.const.WORKFLOW_STAGE_ID_SUBMISSION op="fetchGrid" isSelectable=1 canUpload=1 monographId=$monographId reviewType=$reviewType round=$round escape=false}
-	{load_url_in_div id="availableReviewFilesGrid" url=$availableReviewFilesGridUrl}
+	{url|assign:filesForReviewUrl router=$smarty.const.ROUTE_COMPONENT component="grid.files.submission.SelectableSubmissionDetailsFilesGridHandler" op="fetchGrid" monographId=$monographId reviewType=$currentReviewType round=$round isSelectable=1 escape=false}
+	{load_url_in_div id="filesForReviewGrid" url=$filesForReviewUrl}
 </form>
 
 {init_button_bar id="#initiateReview" submitText="editor.monograph.createNewRound"}
