@@ -13,6 +13,7 @@
  */
 
 import('controllers.modals.editorDecision.form.EditorDecisionForm');
+import('monograph.reviewRound.ReviewRound');
 
 class NewReviewRoundForm extends EditorDecisionForm {
 
@@ -40,6 +41,7 @@ class NewReviewRoundForm extends EditorDecisionForm {
 		$templateMgr =& TemplateManager::getManager();
 		$monograph =& $this->getMonograph();
 		$this->setData('round', $monograph->getCurrentRound());
+		$this->setData('reviewType', $monograph->getCurrentReviewType());
 		return parent::fetch($request);
 	}
 
@@ -88,10 +90,9 @@ class NewReviewRoundForm extends EditorDecisionForm {
 		SeriesEditorAction::recordDecision($seriesEditorSubmission, SUBMISSION_EDITOR_DECISION_RESUBMIT);
 
 		// 2. Create a new internal review round
-		// FIXME #6102: What to do with reviewType?
 		$newRound = $seriesEditorSubmission->getCurrentRound() ? ($seriesEditorSubmission->getCurrentRound() + 1): 1;
-		$reviewRoundDao =& DAORegistry::getDAO('ReviewRoundDAO');
-		$reviewRoundDao->build($monograph->getId(), REVIEW_TYPE_INTERNAL, $newRound, 1, REVIEW_ROUND_STATUS_PENDING_REVIEWERS);
+		$reviewRoundDao =& DAORegistry::getDAO('ReviewRoundDAO'); /* @var $reviewRoundDao ReviewRoundDAO */
+		$reviewRoundDao->build($monograph->getId(), $monograph->getCurrentReviewType(), $newRound, null, REVIEW_ROUND_STATUS_PENDING_REVIEWERS);
 
 		$seriesEditorSubmission->setCurrentRound($newRound);
 		$seriesEditorSubmissionDao->updateSeriesEditorSubmission($seriesEditorSubmission);
@@ -104,7 +105,7 @@ class NewReviewRoundForm extends EditorDecisionForm {
 				$filesWithRevisions[] = explode("-", $selectedFile);
 			}
 			$reviewRoundDAO =& DAORegistry::getDAO('ReviewRoundDAO');
-			$reviewRoundDAO->setFilesForReview($monograph->getId(), REVIEW_TYPE_INTERNAL, $newRound, $filesWithRevisions);
+			$reviewRoundDAO->setFilesForReview($monograph->getId(), $monograph->getCurrentReviewType(), $newRound, $filesWithRevisions);
 		}
 		return $newRound;
 	}
