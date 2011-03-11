@@ -68,6 +68,7 @@ class SystemHandler extends ManagerHandler {
 	function preparedEmails($args, &$request) {
 		$this->setupTemplate(true);
 		$press =& $request->getPress();
+		$pressId = $press->getId();
 
 		$templateMgr =& TemplateManager::getManager();
 		$templateMgr->assign('currentPage', 'preparedEmails');
