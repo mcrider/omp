@@ -75,6 +75,20 @@ class SubmissionSubmitStep3Form extends SubmissionSubmitForm {
 		// determine whether or not to display indexing options.
 		$seriesDao =& DAORegistry::getDAO('SeriesDAO');
 		$this->_data['series'] =& $seriesDao->getById($this->monograph->getSeriesId(), $this->monograph->getPressId());
+
+		// Reassign the values in the keyword containers
+		$disciplinesKeywords = $this->getData('disciplinesKeywords');
+		if ($disciplinesKeywords != null && is_array($disciplinesKeywords)) {
+			$this->setData('disciplinesKeywords', array_map('urldecode', $disciplinesKeywords));
+		}
+		$keywordKeywords = $this->getData('keywordKeywords');
+		if ($keywordKeywords != null && is_array($keywordKeywords)) {
+			$this->setData('keywordKeywords', array_map('urldecode', $keywordKeywords));
+		}
+		$agenciesKeywords = $this->getData('agenciesKeywords');
+		if ($agenciesKeywords != null && is_array($agenciesKeywords)) {
+			$this->setData('agenciesKeywords', array_map('urldecode', $agenciesKeywords));
+		}
 	}
 
 	/**
@@ -84,7 +98,8 @@ class SubmissionSubmitStep3Form extends SubmissionSubmitForm {
 		$templateMgr =& TemplateManager::getManager();
 
 		$templateMgr->assign('isEditedVolume', $this->monograph->getWorkType() == WORK_TYPE_EDITED_VOLUME);
-		
+		$templateMgr->assign('formLocale', $this->getFormLocale());
+
 		return parent::display($request);
 	}
 
@@ -93,7 +108,7 @@ class SubmissionSubmitStep3Form extends SubmissionSubmitForm {
 	 * @return array
 	 */
 	function getLocaleFieldNames() {
-		return array('title', 'abstract');
+		return array('title', 'abstract', 'disciplinesKeywords', 'keywordKeywords', 'agenciesKeywords');
 	}
 
 	/**

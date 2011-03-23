@@ -11,7 +11,7 @@
 {include file="submission/form/submitStepHeader.tpl"}
 
 <div class="separator"></div>
-
+<h1>{$formLocale}</h1>
 <form id="submitStepForm" method="post" action="{url op="saveStep" path=$submitStep}">
 	<input type="hidden" name="monographId" value="{$monographId|escape}" />
 	{include file="common/formErrors.tpl"}
@@ -28,9 +28,9 @@
 				{fbvElement type="textarea" name="abstract[$formLocale]" id="abstract" value=$abstract[$formLocale] size=$fbvStyles.size.MEDIUM measure=$fbvStyles.measure.3OF4}
 			{/fbvFormSection}
 			{fbvFormSection title="submission.submit.metadata"}
-				{fbvKeywordInput id="disciplines" label="search.discipline"} <br />
-				{fbvKeywordInput id="keyword" label="common.keywords"} <br />
-				{fbvKeywordInput id="agencies" label="submission.supportingAgencies"}
+				{fbvKeywordInput id="disciplines" current=$disciplinesKeywords[$formLocale] formLocale=$formLocale label="search.discipline"} <br />
+				{fbvKeywordInput id="keyword" current=$keywordKeywords[$formLocale] formLocale=$formLocale label="common.keywords"} <br />
+				{fbvKeywordInput id="agencies" current=$agenciesKeywords[$formLocale] formLocale=$formLocale label="submission.supportingAgencies"}
 			{/fbvFormSection}
 		{/fbvFormArea}
 	</div>
