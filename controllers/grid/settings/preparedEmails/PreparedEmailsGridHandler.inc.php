@@ -67,20 +67,33 @@ class PreparedEmailsGridHandler extends GridHandler {
 
 		// Grid actions
 		import('lib.pkp.classes.linkAction.LinkAction');
-		import('lib.pkp.classes.linkAction.request.ConfirmationModal');
 		$router =& $request->getRouter();
+
+		// Check if the user has chosen to hide this dialog and determine what control to show for restting emails
+		$user =& $request->getUser();
+		$settingName = 'prepared-emails-hide-reset-all';
+		import('lib.pkp.classes.linkAction.request.ConfirmationModal');
+		$actionRequest = new ConfirmationModal(
+			__('manager.emails.resetAll.message'), null,
+			$router->url($request, null,
+				'grid.settings.preparedEmails.PreparedEmailsGridHandler', 'resetAllEmails'),
+			null, null, null, null,
+			$router->url($request, null,
+				'api.user.UserApiHandler', 'updateUserConfirmMessageVisibility', null, array('setting-name' => $settingName)),
+			$user->getSetting($settingName)
+		);
+
 		$this->addAction(
 			new LinkAction(
 				'resetAll',
-				new ConfirmationModal(
-					__('manager.emails.resetAll.message'), null,
-					$router->url($request, null,
-						'grid.settings.preparedEmails.PreparedEmailsGridHandler', 'resetAllEmails')
-				),
+				$actionRequest,
 				__('manager.emails.resetAll'),
 				'delete'
 			)
 		);
+
+
+
 
 		import('controllers.grid.settings.preparedEmails.linkAction.EditEmailLinkAction');
 		$addEmailLinkAction = & new EditEmailLinkAction($request);
@@ -95,7 +108,6 @@ class PreparedEmailsGridHandler extends GridHandler {
 		$this->addColumn(new GridColumn('subject', 'common.subject', null, 'controllers/grid/gridCell.tpl', $cellProvider));
 		$this->addColumn(new GridColumn('enabled', 'common.enabled', null, 'controllers/grid/common/cell/checkMarkCell.tpl', $cellProvider));
 	}
-
 
 	//
 	// Overridden methods from GridHandler
