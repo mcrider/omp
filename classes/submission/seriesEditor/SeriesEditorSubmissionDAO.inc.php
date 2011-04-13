@@ -387,7 +387,11 @@ class SeriesEditorSubmissionDAO extends DAO {
 	 * @param $monographId int
 	 * @return array matching Users
 	 */
-	function &getReviewersNotAssignedToMonograph($pressId, $monographId) {
+	function &getReviewersNotAssignedToMonograph($pressId, $monographId, $name = '') {
+		$params = array($monographId, $pressId, ROLE_ID_REVIEWER);
+		if ( !empty($name) ) {
+			$params = array_merge($params, array_pad(array(), 4, '%' . $name . '%'));
+		}
 
 		$result =& $this->retrieve(
 			'SELECT	u.*
@@ -397,9 +401,10 @@ class SeriesEditorSubmissionDAO extends DAO {
 				LEFT JOIN review_assignments r ON (r.reviewer_id = u.user_id AND r.submission_id = ?)
 			WHERE	ug.context_id = ? AND
 				ug.role_id = ? AND
-				r.submission_id IS NULL
-			ORDER BY last_name, first_name',
-			array($monographId, $pressId, ROLE_ID_REVIEWER)
+				r.submission_id IS NULL' .
+				(!empty($name)?' AND (first_name LIKE ? OR last_name LIKE ? OR username LIKE? OR email LIKE ?)':'') .
+			' ORDER BY last_name, first_name',
+			$params
 		);
 
 		$returner = new DAOResultFactory($result, $this, '_returnReviewerUserFromRow');
