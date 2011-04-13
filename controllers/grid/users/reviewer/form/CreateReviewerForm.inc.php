@@ -19,7 +19,8 @@ class CreateReviewerForm extends ReviewerForm {
 	 * Constructor.
 	 */
 	function CreateReviewerForm($monograph, $reviewAssignmentId) {
-		parent::ReviewerForm('controllers/grid/users/reviewer/form/createReviewerForm.tpl', $monograph, $reviewAssignmentId);
+		parent::ReviewerForm($monograph, $reviewAssignmentId);
+		$this->setTemplate('controllers/grid/users/reviewer/form/createReviewerForm.tpl');
 
 		$this->addCheck(new FormValidator($this, 'firstname', 'required', 'user.profile.form.firstNameRequired'));
 		$this->addCheck(new FormValidator($this, 'lastname', 'required', 'user.profile.form.lastNameRequired'));
@@ -39,15 +40,15 @@ class CreateReviewerForm extends ReviewerForm {
 		parent::readInputData();
 
 		$this->readUserVars(array('firstname',
-								'middlename',
-								'lastname',
-								'affiliation',
-								'interests',
-								'interestsKeywords',
-								'username',
-								'email',
-								'sendNotify',
-								'userGroupId'));
+							'middlename',
+							'lastname',
+							'affiliation',
+							'interests',
+							'interestsKeywords',
+							'username',
+							'email',
+							'sendNotify',
+							'userGroupId'));
 	}
 
 	/**
@@ -72,25 +73,25 @@ class CreateReviewerForm extends ReviewerForm {
 		$password = Validation::generatePassword();
 
 		if (isset($auth)) {
-		$user->setPassword($password);
-		// FIXME Check result and handle failures
-		$auth->doCreateUser($user);
-		$user->setAuthId($auth->authId);
-		$user->setPassword(Validation::encryptCredentials($user->getId(), Validation::generatePassword())); // Used for PW reset hash only
+			$user->setPassword($password);
+			// FIXME Check result and handle failures
+			$auth->doCreateUser($user);
+			$user->setAuthId($auth->authId);
+			$user->setPassword(Validation::encryptCredentials($user->getId(), Validation::generatePassword())); // Used for PW reset hash only
 		} else {
-		$user->setPassword(Validation::encryptCredentials($this->getData('username'), $password));
+			$user->setPassword(Validation::encryptCredentials($this->getData('username'), $password));
 		}
 
 		$user->setDateRegistered(Core::getCurrentDate());
 		$reviewerId = $userDao->insertUser($user);
 
-		// Set the reviewerId in the Form for the subclass to use
+		// Set the reviewerId in the Form for the parent class to use
 		$this->setData('reviewerId', $reviewerId);
 
 		// Add reviewing interests to interests table
 		import('lib.pkp.classes.user.InterestManager');
 		$interestManager = new InterestManager();
-		$interestManager->insertInterests($userId, $this->getData('interestsKeywords'), $this->getData('interests'));
+		$interestManager->insertInterests($reviewerId, $this->getData('interestsKeywords'), $this->getData('interests'));
 
 		// Assign the selected user group ID to the user
 		$userGroupDao =& DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */

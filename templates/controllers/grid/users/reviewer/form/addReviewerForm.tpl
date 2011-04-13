@@ -11,7 +11,10 @@
 	// Attach the JS file tab handler.
 	$(function() {ldelim}
 		$('#addReviewerTabs').pkpHandler(
-				'$.pkp.controllers.TabHandler');
+				'$.pkp.controllers.TabHandler',
+				{ldelim}
+					emptyLastTab: true
+				{rdelim});
 	{rdelim});
 </script>
 <div id="addReviewerTabs">

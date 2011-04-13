@@ -29,20 +29,6 @@ $("#interests").tagit({ldelim}
 	{fbvElement type="text" id="reviewDueDate" name="reviewDueDate" label="editor.review.reviewDueDate" value=$reviewDueDate }
 {/fbvFormSection}
 
-<!--  Ensuring a blind review for this reviewer -->
-{if $reviewMethod == 1}
-	{assign var='blindReview' value=true}
-{elseif $reviewMethod == 2}
-	{assign var='doubleBlindReview' value=true}
-{elseif $reviewMethod == 3}
-	{assign var='openReview' value=true}
-{/if}
-{fbvFormSection title="editor.submissionReview.reviewType"}
-	{fbvElement type="radio" name="reviewMethod" id="blindReview" label="editor.submissionReview.blind" checked=$blindReview}
-	{fbvElement type="radio" name="reviewMethod" id="doubleBlindReview" label="editor.submissionReview.doubleBlind" checked=$doubleBlindReview}
-	{fbvElement type="radio" name="reviewMethod" id="openReview" label="editor.submissionReview.open" checked=$openReview}
-{/fbvFormSection}
-
 <!-- All of the hidden inputs -->
 <input type="hidden" name="selectionType" value={$selectionType|escape} />
 <input type="hidden" name="monographId" value={$monographId|escape} />

@@ -8,7 +8,7 @@
  *
  *}
 
-<script type="text/javascript"> 
+<script type="text/javascript">
 	$(function() {ldelim}
 		// Attach the form handler.
 		$('#createReviewerForm').pkpHandler('$.pkp.controllers.form.AjaxFormHandler');
@@ -44,6 +44,6 @@
 	{/fbvFormSection}
 
 	{include file="controllers/grid/users/reviewer/form/reviewerFormFooter.tpl"}
-	
+
 	{include file="form/formButtons.tpl" submitText="editor.monograph.addReviewer"}
 </form>

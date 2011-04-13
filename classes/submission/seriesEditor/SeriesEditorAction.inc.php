@@ -146,7 +146,6 @@ class SeriesEditorAction extends Action {
 		if ($round == null) {
 			$round = $seriesEditorSubmission->getCurrentRound();
 		}
-
 		$assigned = $seriesEditorSubmissionDao->reviewerExists($seriesEditorSubmission->getId(), $reviewerId, $reviewType, $round);
 
 		// Only add the reviewer if he has not already

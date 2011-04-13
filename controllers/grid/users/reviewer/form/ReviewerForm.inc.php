@@ -25,8 +25,8 @@ class ReviewerForm extends Form {
 	/**
 	 * Constructor.
 	 */
-	function ReviewerForm($template, $monograph, $reviewAssignmentId) {
-		parent::Form($template);
+	function ReviewerForm($monograph, $reviewAssignmentId) {
+		parent::Form('controllers/grid/users/reviewer/form/defaultReviewerForm.tpl');
 		$this->setMonograph($monograph);
 		$this->setReviewAssignmentId(empty($reviewAssignmentId)? null: (int) $reviewAssignmentId);
 
@@ -103,18 +103,17 @@ class ReviewerForm extends Form {
 			}
 		}
 
-		// Get the review method (open, blind, or double-blind)
 		$round = (int) $request->getUserVar('round');
 		$reviewAssignmentDao =& DAORegistry::getDAO('ReviewAssignmentDAO');
 		// FIXME: Bug #6199
 		$reviewType = (int) $request->getUserVar('reviewType');
 
-		$reviewAssignment =& $reviewAssignmentDao->getReviewAssignment($this->getMonographId(), $reviewerId, $round, $reviewType);
-		if(isset($reviewAssignment)) {
-			$reviewMethod = $reviewAssignment->getReviewMethod();
-		} else $reviewMethod = SUBMISSION_REVIEW_METHOD_BLIND;
+		// Get the review method (open, blind, or double-blind)
+		// FIXME: Bug #6403, Need to be able to specify the review method
+		$reviewMethod = SUBMISSION_REVIEW_METHOD_BLIND;
 
 		// Get the response/review due dates or else set defaults
+		$reviewAssignment =& $reviewAssignmentDao->getReviewAssignment($this->getMonographId(), $reviewerId, $round, $reviewType);
 		if (isset($reviewAssignment) && $reviewAssignment->getDueDate() != null) {
 			$reviewDueDate = strftime(Config::getVar('general', 'date_format_short'), strtotime($reviewAssignment->getDueDate()));
 		} else {
@@ -203,7 +202,7 @@ class ReviewerForm extends Form {
 		$round = $this->getData('round');
 		$reviewDueDate = $this->getData('reviewDueDate');
 		$responseDueDate = $this->getData('responseDueDate');
-		$reviewerId = $this->getData('reviewerId');
+		$reviewerId = (int) $this->getData('reviewerId');
 
 		import('classes.submission.seriesEditor.SeriesEditorAction');
 		$seriesEditorAction = new SeriesEditorAction();

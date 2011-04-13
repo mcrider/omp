@@ -47,7 +47,7 @@ class ReviewerGridHandler extends GridHandler {
 			array(ROLE_ID_SERIES_EDITOR, ROLE_ID_PRESS_MANAGER),
 			array(
 				'fetchGrid', 'fetchRow', 'addReviewer', 'showReviewerForm', 'editReviewer', 'updateReviewer', 'deleteReviewer',
-				'getReviewerAutocomplete', 'getReviewerRoleAssignmentAutocomplete', 'readReview',
+				'getReviewersNotAssignedToMonograph', 'getUsersNotAssignedAsReviewers', 'readReview',
 				'createReviewer', 'editReminder', 'sendReminder'
 			)
 		);
@@ -241,7 +241,7 @@ class ReviewerGridHandler extends GridHandler {
 		$reviewerForm = new $formClassName($this->getMonograph(), $reviewAssignmentId);
 		$reviewerForm->initData($args, $request);
 
-		$json = new JSON(true, $reviewerForm->fetch($request));
+		$json = new JSONMessage(true, $reviewerForm->fetch($request));
 		return $json->getString();
 	}
 
@@ -314,90 +314,58 @@ class ReviewerGridHandler extends GridHandler {
 			return DAO::getDataChangedEvent($reviewId);
 		} else {
 			// FIXME: this locale key does not exist. and it is probably not the right name for it.
-			$json = new JSON(false, Locale::translate('submission.submit.errorDeletingReviewer'));
+			$json = new JSONMessage(false, Locale::translate('submission.submit.errorDeletingReviewer'));
 			return $json->getString();
 		}
 	}
 
 
 	/**
-	* Get potential reviewers for editor's reviewer selection autocomplete.
-	* @param $args array
-	* @param $request PKPRequest
-	* @return string Serialized JSON object
-	*/
-	function getReviewerAutocomplete($args, &$request) {
-		// Get items to populate possible items list with
+	 * Get potential reviewers for editor's reviewer selection autocomplete.
+	 * @param $args array
+	 * @param $request PKPRequest
+	 * @return string Serialized JSON object
+	 */
+	function getReviewersNotAssignedToMonograph($args, &$request) {
 		$press =& $request->getPress();
 		$monograph =& $this->getMonograph();
+		$round = (int) $request->getUserVar('round');
 		$term = $request->getUserVar('term');
 
-		$seriesEditorSubmissionDAO =& DAORegistry::getDAO('SeriesEditorSubmissionDAO');
-		$allReviewers = $seriesEditorSubmissionDAO->getReviewersNotAssignedToMonograph($press->getId(), $monograph->getId(), $term);
-		$currentRoundReviewers =& $seriesEditorSubmissionDAO->getReviewersForMonograph($press->getId(), $monograph->getId(), $this->getRound());
-		$currentRoundReviewerIds = array_keys($currentRoundReviewers->toAssociativeArray('id'));
+		$seriesEditorSubmissionDao =& DAORegistry::getDAO('SeriesEditorSubmissionDAO'); /* @var $seriesEditorSubmissionDao SeriesEditorSubmissionDAO */
+		$reviewers =& $seriesEditorSubmissionDao->getReviewersNotAssignedToMonograph($press->getId(), $monograph->getId(), $round, $term);
 
-		// FIXME: we should be able to query without the reviewers. The DAO call might be doing it now.
-		// Should confirm and then possibly alter the following lines.
-		$itemList = array();
-		foreach ($allReviewers->toAssociativeArray('id') as $i => $reviewer) {
-			// Check that the reviewer is not in the current round.  We need to do the comparison here to avoid nested selects.
-			if (!in_array($i, $currentRoundReviewerIds)) {
-				$itemList[] = array(
-					'id' => $reviewer->getId(),
-					'name' => $reviewer->getFullName(),
-					'abbrev' => $reviewer->getUsername()
-				);
-			}
+		$reviewerList = array();
+		while($reviewer =& $reviewers->next()) {
+			$reviewerList[] = array('label' => $reviewer->getFullName(), 'value' => $reviewer->getId());
+			unset($reviewer);
 		}
 
-		// FIXME: this is not right. first, I cannot use json_encode here. Second
-		// this encoding an array and then imploding is kind of weird.
-		// I just cannot figure this out right now.
-		$values = array();
-		foreach ($itemList as $i => $item) {
-			$values[] = json_encode(array('label' => $item['name'], 'value' => $item['id']));
-		}
-//		$json = new JSON(true, $values);
-//		echo $json->getString();
-		echo "[" . implode($values, ",") . "]";
+		$json = new JSONMessage(true, $reviewerList);
+		echo $json->getString();
 	}
 
 	/**
-	* Get a list of all non-reviewer users in the system to populate the reviewer role assignment autocomplete.
-	* @param $args array
-	* @param $request PKPRequest
-	* @return string Serialized JSON object
-	*/
-	function getReviewerRoleAssignmentAutocomplete($args, &$request) {
+	 * Get a list of all non-reviewer users in the system to populate the reviewer role assignment autocomplete.
+	 * @param $args array
+	 * @param $request PKPRequest
+	 * @return string Serialized JSON object
+	 */
+	function getUsersNotAssignedAsReviewers($args, &$request) {
 		$press =& $request->getPress();
-		$userGroupDao =& DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
-		$users =& $userGroupDao->getUsersByContextId($press->getId());
+		$term = $request->getUserVar('term');
 
-		$itemList = array();
-		$roleDao =& DAORegistry::getDAO('RoleDAO'); /* @var $roleDao RoleDAO */
+		$userGroupDao =& DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
+		$users =& $userGroupDao->getUsersNotInRole($press->getId(), ROLE_ID_REVIEWER, $term);
+
+		$userList = array();
 		while ($user =& $users->next()) {
-			// Check that the reviewer is not in the current round.  We need to do the comparison here to avoid nested selects.
-			if (!$roleDao->userHasRole($press->getId(), $user->getId(), ROLE_ID_REVIEWER)) {
-				$itemList[] = array(
-					'id' => $user->getId(),
-					'name' => $user->getFullName(),
-					'abbrev' => $user->getUsername()
-				);
-			}
+			$userList[] = array('label' => $user->getFullName(), 'value' => $user->getId());
 			unset($user);
 		}
 
-		// FIXME: this is not right. first, I cannot use json_encode here. Second
-		// this encoding an array and then imploding is kind of weird.
-		// I just cannot figure this out right now.
-		$values = array();
-		foreach ($itemList as $i => $item) {
-			$values[] = json_encode(array('label' => $item['name'], 'value' => $item['id']));
-		}
-//		$json = new JSON(true, $values);
-//		echo $json->getString();
-		echo "[" . implode($values, ",") . "]";
+		$json = new JSONMessage(true, $userList);
+		echo $json->getString();
 	}
 
 	/**
