@@ -560,8 +560,8 @@ class SeriesEditorSubmissionDAO extends DAO {
 			foreach ($interests as $key => $interest) {
 				$interestIds = $interestDao->getUserIdsByInterest($interest);
 				if(!$interestIds) {
-					// The interest searched for does not exist -- return an empty set of users
-					return array();
+					// The interest searched for does not exist -- go to next interest
+					continue;
 				}
 				if ($key == 0) $allInterestIds = $interestIds; // First interest, nothing to intersect with
 				else $allInterestIds = array_intersect($allInterestIds, $interestIds);

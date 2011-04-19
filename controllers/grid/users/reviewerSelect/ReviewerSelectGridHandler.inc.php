@@ -28,7 +28,7 @@ class ReviewerSelectGridHandler extends GridHandler {
 		parent::GridHandler();
 
 		$this->addRoleAssignment(array(ROLE_ID_SERIES_EDITOR, ROLE_ID_PRESS_MANAGER),
-				array('fetchGrid', 'updateReviewerSelect'));
+				array('fetchGrid'));
 	}
 
 	//
@@ -53,24 +53,8 @@ class ReviewerSelectGridHandler extends GridHandler {
 	function initialize(&$request) {
 		parent::initialize($request);
 
-		Locale::requireComponents(array(LOCALE_COMPONENT_OMP_EDITOR, LOCALE_COMPONENT_PKP_USER, LOCALE_COMPONENT_PKP_SUBMISSION));
+		Locale::requireComponents(array(LOCALE_COMPONENT_PKP_SUBMISSION, LOCALE_COMPONENT_PKP_MANAGER, LOCALE_COMPONENT_PKP_USER, LOCALE_COMPONENT_OMP_EDITOR));
 		$monograph =& $this->getAuthorizedContextObject(ASSOC_TYPE_MONOGRAPH);
-
-		// Retrieve the submissionContributors associated with this monograph to be displayed in the grid
-		$doneMin = $request->getUserVar('doneMin');
-		$doneMax = $request->getUserVar('doneMax');
-		$avgMin = $request->getUserVar('avgMin');
-		$avgMax = $request->getUserVar('avgMax');
-		$lastMin = $request->getUserVar('lastMin');
-		$lastMax = $request->getUserVar('lastMax');
-		$activeMin = $request->getUserVar('activeMin');
-		$activeMax = $request->getUserVar('activeMax');
-		$interests = null;
-
-		$seriesEditorSubmissionDao =& DAORegistry::getDAO('SeriesEditorSubmissionDAO');
-		$data =& $seriesEditorSubmissionDao->getFilteredReviewers($monograph->getPressId(), $doneMin, $doneMax, $avgMin, $avgMax,
-					$lastMin, $lastMax, $activeMin, $activeMax, $interests, $monograph->getId(), $monograph->getCurrentRound());
-		$this->setGridDataElements($data);
 
 		// Columns
 		$cellProvider = new ReviewerSelectGridCellProvider();
@@ -153,22 +137,43 @@ class ReviewerSelectGridHandler extends GridHandler {
 	}
 
 	/**
-	 * Get a filtered list of reviewers based on the editor's selections
-	 * @param $args array
-	 * @param $request PKPRequest
+	 * @see GridHandler::loadData()
 	 */
-	function updateReviewerSelect($args, &$request) {
+	function loadData($request, $filter) {
+		// Get the monograph
 		$monograph =& $this->getAuthorizedContextObject(ASSOC_TYPE_MONOGRAPH);
 
-		// Retrieve the filtered list of reviewers
-		$doneMin = (int) $request->getUserVar('doneMin');
-		$doneMax = (int) $request->getUserVar('doneMax');
-		$avgMin = (int) $request->getUserVar('avgMin');
-		$avgMax = (int) $request->getUserVar('avgMax');
-		$lastMin = (int) $request->getUserVar('lastMin');
-		$lastMax = (int) $request->getUserVar('lastMax');
-		$activeMin = (int) $request->getUserVar('activeMin');
-		$activeMax = (int) $request->getUserVar('activeMax');
+		// Retrieve the submissionContributors associated with this monograph to be displayed in the grid
+		$done_min = $filter['done_min'];
+		$done_max = $filter['done_max'];
+		$avg_min = $filter['avg_min'];
+		$avg_max = $filter['avg_max'];
+		$last_min = $filter['last_min'];
+		$last_max = $filter['last_max'];
+		$active_min = $filter['active_min'];
+		$active_max = $filter['active_max'];
+		$interests = $filter['interests'];
+
+		$seriesEditorSubmissionDao =& DAORegistry::getDAO('SeriesEditorSubmissionDAO');
+		$data =& $seriesEditorSubmissionDao->getFilteredReviewers($monograph->getPressId(), $done_min, $done_max, $avg_min, $avg_max,
+					$last_min, $last_max, $active_min, $active_max, $interests, $monograph->getId(), $monograph->getCurrentRound());
+		return $data;
+	}
+
+	/**
+	 * @see GridHandler::getFilterSelectionData()
+	 * @return array Filter selection data.
+	 */
+	function getFilterSelectionData($request) {
+		// Get the values searched for
+		$doneMin = (int) $request->getUserVar('done_min');
+		$doneMax = (int) $request->getUserVar('done_max');
+		$avgMin = (int) $request->getUserVar('avg_min');
+		$avgMax = (int) $request->getUserVar('avg_max');
+		$lastMin = (int) $request->getUserVar('last_min');
+		$lastMax = (int) $request->getUserVar('last_max');
+		$activeMin = (int) $request->getUserVar('active_min');
+		$activeMax = (int) $request->getUserVar('active_max');
 		$interests = $request->getUserVar('interestSearchKeywords');
 		if(isset($interests) && is_array($interests)) {
 			$interests = array_map('urldecode', $interests); // The interests are coming in encoded -- Decode them for DB storage
@@ -176,15 +181,28 @@ class ReviewerSelectGridHandler extends GridHandler {
 			$interests = array();
 		}
 
-		$seriesEditorSubmissionDao =& DAORegistry::getDAO('SeriesEditorSubmissionDAO');
-		$data =& $seriesEditorSubmissionDao->getFilteredReviewers($monograph->getPressId(), $doneMin, $doneMax, $avgMin, $avgMax,
-					$lastMin, $lastMax, $activeMin, $activeMax, $interests, $monograph->getId(), $monograph->getCurrentRound());
-		$this->setGridDataElements($data);
-
-		// Re-display the grid
-		return $this->fetchGrid($args,$request);
+		return $filterSelectionData = array(
+			'done_min' => $doneMin,
+			'done_max' => $doneMax,
+			'avg_min' => $avgMin,
+			'avg_max' => $avgMax,
+			'last_min' => $lastMin,
+			'last_max' => $lastMax,
+			'active_min' => $activeMin,
+			'active_max' => $activeMax,
+			'interests' => $interests
+		);
 	}
 
+	/**
+	 * @see GridHandler::getFilterForm()
+	 */
+	function getFilterForm() {
+		$monograph =& $this->getAuthorizedContextObject(ASSOC_TYPE_MONOGRAPH);
+		import('controllers.grid.users.reviewerSelect.form.AdvancedSearchReviewerFilterForm');
+		$filterForm = new AdvancedSearchReviewerFilterForm($monograph, null);
+		return $filterForm;
+	}
 }
 
 ?>
