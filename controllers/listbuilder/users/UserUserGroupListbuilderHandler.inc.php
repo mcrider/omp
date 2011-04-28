@@ -185,6 +185,7 @@ class UserUserGroupListbuilderHandler extends ListbuilderHandler {
 		$this->loadList();
 
 		// Basic configuration
+		$this->setTitle($request->getUserVar('title'));
 		$this->setSourceType(LISTBUILDER_SOURCE_TYPE_SELECT);
 		$this->addColumn(new ListbuilderGridColumn($this, 'name', 'common.name'));
 		$this->addColumn(new ListbuilderGridColumn($this, 'designation', 'common.designation'));
@@ -244,7 +245,7 @@ class UserUserGroupListbuilderHandler extends ListbuilderHandler {
 		return true;
 	}
 
-	/**             
+	/**
          * Delete an entry.
          * @param $rowId mixed ID of row to modify
          * @return boolean

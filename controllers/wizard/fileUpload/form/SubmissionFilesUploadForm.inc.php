@@ -173,16 +173,12 @@ class SubmissionFilesUploadForm extends SubmissionFilesUploadBaseForm {
 		if (count($uploaderUserGroups) > 1) {
 			// See whether the current user has been assigned as
 			// a workflow stage participant.
-			$stageId = $this->getStageId();
-			$signoffDao =& DAORegistry::getDAO('SignoffDAO'); /* @var $signoffDao SignoffDAO */
-			$stageSignoffs =& $signoffDao->getAllBySymbolic(
-				'SIGNOFF_STAGE',
-				ASSOC_TYPE_MONOGRAPH, $this->getData('monographId'),
-				$user->getId(), $stageId
-			);
-			while($stageSignoff =& $stageSignoffs->next()) { /* @var $stageSignoff Signoff */
-				if (isset($uploaderUserGroups[$stageSignoff->getUserGroupId()])) {
-					$defaultUserGroupId = $stageSignoff->getUserGroupId();
+			$stageAssignmentDao = & DAORegistry::getDAO('StageAssignmentDAO'); /* @var $stageAssignmentDao StageAssignmentDAO */
+			$stageAssignments = $stageAssignmentDao->getBySubmissionAndStageId($monograph->getId(), $this->getStageId(), null, $user->getId());
+
+			while($stageAssignment =& $stageAssignments->next()) { /* @var $stageSignoff Signoff */
+				if (isset($uploaderUserGroups[$stageAssignment->getUserGroupId()])) {
+					$defaultUserGroupId = $stageAssignment->getUserGroupId();
 					break;
 				}
 			}

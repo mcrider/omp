@@ -93,7 +93,7 @@ class SeriesEditorAction extends Action {
 				$users =& $userGroupDao->getUsersById($userGroup->getId());
 				if($users->getCount() == 1) {
 					$user =& $users->next();
-					$signoffDao->build('SIGNOFF_STAGE', ASSOC_TYPE_MONOGRAPH, $monograph->getId(), $user->getId(), $stageId, $userGroup->getId());
+					$signoffDao->build('SIGNOFF_STAGE', ASSOC_TYPE_MONOGRAPH, $monograph->getId(), null, $userGroup->getId());
 				}
 			}
 		}
@@ -103,7 +103,7 @@ class SeriesEditorAction extends Action {
 		//   assigned for the submitter should be author; If its a volume,
 		// 	 it should be a volume editor user group.
 		$authorUserGroup =& $userGroupDao->getDefaultByRoleId($monograph->getPressId(), ROLE_ID_AUTHOR);
-		$signoffDao->build('SIGNOFF_STAGE', ASSOC_TYPE_MONOGRAPH, $monograph->getId(), $monograph->getUserId(), $stageId, $authorUserGroup->getId());
+		$signoffDao->build('SIGNOFF_STAGE', ASSOC_TYPE_MONOGRAPH, $monograph->getId(), $monograph->getUserId(), null, $authorUserGroup->getId());
 
 		// Reviewer roles -- Do nothing. Reviewers are not included in the stage participant list, they
 		// are administered via review assignments.

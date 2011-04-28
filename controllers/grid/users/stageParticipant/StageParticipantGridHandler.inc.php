@@ -100,27 +100,27 @@ class StageParticipantGridHandler extends GridHandler {
 		);
 
 		// Columns
-		import('lib.pkp.classes.controllers.grid.ArrayGridCellProvider');
-		$cellProvider = new ArrayGridCellProvider();
+		import('controllers.grid.users.stageParticipant.StageParticipantGridCellProvider');
+		$cellProvider = new StageParticipantGridCellProvider();
 		$this->addColumn(
 			new GridColumn(
-				'userName',
-				'author.users.contributor.name',
-				null,
-				'controllers/grid/gridCell.tpl',
-				$cellProvider
-			)
-		);
-
-		$this->addColumn(
-			new GridColumn(
-				'userGroup',
+				'group',
 				'author.users.contributor.role',
 				null,
 				'controllers/grid/gridCell.tpl',
 				$cellProvider
 			)
 		);
+		$this->addColumn(
+			new GridColumn(
+				'participants',
+				'submission.participants',
+				null,
+				'controllers/grid/gridCell.tpl',
+				$cellProvider
+			)
+		);
+
 	}
 
 
@@ -152,25 +152,20 @@ class StageParticipantGridHandler extends GridHandler {
 	function loadData($request, $filter) {
 		// Retrieve the signoffs.
 		$monograph =& $this->getMonograph();
-		$signoffDao =& DAORegistry::getDAO('SignoffDAO'); /* @var $signoffDao SignoffDAO */
-		$signoffFactory =& $signoffDao->getAllBySymbolic(
-			'SIGNOFF_STAGE', ASSOC_TYPE_MONOGRAPH, $monograph->getId(), null, $this->getStageId()
-		);
+		$press =& $request->getPress();
 
-		// Prepare the element list as an array with the user name
-		// and user group for each sign off.
-		$elements = array();
-		$userDao =& DAORegistry::getDAO('UserDAO');
-		$userGroupDao =& DAORegistry::getDAO('UserGroupDAO');
-		while($signoff =& $signoffFactory->next()) { /* @var $signoff Signoff */
-			$user =& $userDao->getUser($signoff->getUserId());
-			$userGroup =& $userGroupDao->getById($signoff->getUserGroupId());
-			$elements[(int)$signoff->getId()] = array(
-				'userName' => $user->getFullName(),
-				'userGroup' => $userGroup->getLocalizedAbbrev()
-			);
+		// Get each default user group ID, then load users by that user group ID
+		$userGroupDao = & DAORegistry::getDAO('UserGroupDAO'); /* @var $userGroupDao UserGroupDAO */
+		$userGroups =& $userGroupDao->getUserGroupsByStage($press->getId(), $this->getStageId());
+
+		$stageAssignments = array();
+		$stageAssignmentDao = & DAORegistry::getDAO('StageAssignmentDAO'); /* @var $stageAssignmentDao StageAssignmentDAO */
+		while($userGroup =& $userGroups->next()) {
+			$stageAssignments[$userGroup->getId()] = $stageAssignmentDao->getUsersBySubmissionAndStageId($monograph->getId(), $this->getStageId(), $userGroup->getId());
+			unset($userGroup);
 		}
-		return $elements;
+
+		return $stageAssignments;
 	}
 
 
