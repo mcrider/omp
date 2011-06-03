@@ -91,7 +91,7 @@ class ChapterContributorListbuilderHandler extends ListbuilderHandler {
 
 		// Retrieve all submissionContributors associated with this monograph to be displayed in the drop-down list
 		$authorDao =& DAORegistry::getDAO('AuthorDAO');
-		$submissionContributors =& $authorDao->getAuthorsByMonographId($monographId);
+		$submissionContributors =& $authorDao->getAuthorsBySubmissionId($monographId);
 		$chapterAuthorDao =& DAORegistry::getDAO('ChapterAuthorDAO');
 		$contributorIds = $chapterAuthorDao->getAuthorIdsByChapterId($chapterId, $monographId);
 
