@@ -95,11 +95,9 @@ function prepBlockFields() {
 {if count($formLocales) > 1}
 {fbvFormArea id="locales"}
 {fbvFormSection title="form.formLanguage" for="languageSelector"}
-	{fbvCustomElement}
-		{url|assign:"setupFormUrl" op="setup" path="1"}
-		{form_language_chooser form="setupForm" url=$setupFormUrl}
-		<span class="instruct">{translate key="form.formLanguage.description"}</span>
-	{/fbvCustomElement}
+	{url|assign:"setupFormUrl" op="setup" path="1"}
+	{form_language_chooser form="setupForm" url=$setupFormUrl}
+	<span class="instruct">{translate key="form.formLanguage.description"}</span>
 {/fbvFormSection}
 {/fbvFormArea}
 {/if} {* count($formLocales) > 1*}

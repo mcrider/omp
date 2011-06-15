@@ -56,11 +56,9 @@
 {fbvFormArea id="registration"}
 {if count($formLocales) > 1 && !$existingUser}
 	{fbvFormSection title="form.formLanguage" for="languageSelector"}
-		{fbvCustomElement}
-			{url|assign:"registerFormUrl" op="register"}
-			{form_language_chooser form="register" url=$registerFormUrl}
-			<p>{translate key="form.formLanguage.description"}</p>
-		{/fbvCustomElement}
+		{url|assign:"registerFormUrl" op="register"}
+		{form_language_chooser form="register" url=$registerFormUrl}
+		<p>{translate key="form.formLanguage.description"}</p>
 	{/fbvFormSection}
 {/if}{* count($formLocales) > 1 && !$existingUser *}
 

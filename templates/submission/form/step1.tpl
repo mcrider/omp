@@ -19,8 +19,8 @@
 	<h3>{translate key="submission.workType"}</h3>
 
 	<p>{translate key="submission.workType.description"}</p>
-	{fbvFormArea id="submissionType" list="true"}
-		{fbvFormSection list="true"}
+	{fbvFormArea id="submissionType"}
+		{fbvFormSection}
 			{fbvElement type="radio" name="isEditedVolume" id="isEditedVolume-0" value="1" checked=$isEditedVolume label="submission.workType.editedVolume"}
 			{if $isEditedVolume}{assign var=notIsEditedVolume value=0}{else}{assign var=notIsEditedVolume value=1}{/if}
 			{fbvElement type="radio" name="isEditedVolume" id="isEditedVolume-1" value="0" checked=$notIsEditedVolume label="submission.workType.authoredWork"}

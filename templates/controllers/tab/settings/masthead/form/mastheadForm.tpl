@@ -15,7 +15,7 @@
     {rdelim});
 </script>
 
-<form class="pkp_form" id="mastheadForm" method="post"
+<form class="pkp_form pkp_controllers_form" id="mastheadForm" method="post"
       action="{url router=$smarty.const.ROUTE_COMPONENT component="tab.settings.PressSettingsTabHandler" op="saveFormData" tab="masthead"}">
 {include file="common/formErrors.tpl"}
 {include file="controllers/tab/settings/wizardMode.tpl" wizardMode=$wizardMode}
@@ -24,7 +24,7 @@
         <legend>Group Title</legend>
 
 
-	   
+
         <div>
             <label>Single Label With Multiple Inline Inputs</label>
 

@@ -15,7 +15,7 @@
 	{rdelim});
 </script>
 
-<form class="pkp_form" id="homepageForm" method="post" action="{url router=$smarty.const.ROUTE_COMPONENT component="tab.settings.WebsiteSettingsTabHandler" op="saveFormData" tab="homepage"}">
+<form class="pkp_form pkp_controllers_form" id="homepageForm" method="post" action="{url router=$smarty.const.ROUTE_COMPONENT component="tab.settings.WebsiteSettingsTabHandler" op="saveFormData" tab="homepage"}">
 	{include file="common/formErrors.tpl"}
 
 	<h3>{translate key="manager.setup.announcements"}</h3>
