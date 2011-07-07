@@ -52,7 +52,8 @@
 		$(function() {ldelim}
 			// Attach the form handler.
 			$('#submitStepForm').pkpHandler('$.pkp.controllers.form.AjaxFormHandler', {ldelim}
-				baseUrl: '{$baseUrl|escape:"javascript"}'
+				baseUrl: '{$baseUrl|escape:"javascript"}',
+				cancelRedirectUrl: '{url page="dashboard" op="status"}'
 			{rdelim});
 		{rdelim});
 	</script>

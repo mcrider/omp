@@ -61,12 +61,14 @@
 		{fbvElement type="textarea" name="privacyStatement" id="privacyStatement" disabled=true value=$currentPress->getLocalizedSetting('privacyStatement') rich=true}
 	{/fbvFormSection}
 
-	<!-- Buttons -->
-	{include file="form/formButtons.tpl" submitText="common.saveAndContinue"}
+	{if $submissionProgress > 1}
+		{assign var="confirmCancelMessage" value="submission.submit.cancelSubmission"}
+	{else}
+		{assign var="confirmCancelMessage" value="submission.submit.cancelSubmissionStep1"}
+	{/if}
 
-{* TODO: Add this to cancel button *}
-{*	<input type="button" value="{translate key="common.cancel"}" class="button"*}
-{*		   onclick="{if $monographId}confirmAction('{url page="dashboard" op="status"}', '{translate|escape:"jsparam" key="submission.submit.cancelSubmission"}'){else}document.location.href='{url page="dashboard" op="status" escape=false}'{/if}"/>*}
+	<!-- Buttons -->
+	{fbvFormButtons id="step1Buttons" submitText="common.saveAndContinue" confirmCancel=$confirmCancelMessage}
 
 {/fbvFormArea}
 
