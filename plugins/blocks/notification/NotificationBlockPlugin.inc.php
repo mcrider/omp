@@ -65,7 +65,7 @@ class NotificationBlockPlugin extends BlockPlugin {
 		if ($user && $press) {
 			$userId = $user->getId();
 			$notificationDao =& DAORegistry::getDAO('NotificationDAO');
-			$templateMgr->assign('unreadNotifications',  $notificationDao->getUnreadNotificationCount($userId));
+			$templateMgr->assign('unreadNotifications',  $notificationDao->getUnreadNotificationCount($press->getId(), $userId));
 		}
 
 		return parent::getContents($templateMgr);

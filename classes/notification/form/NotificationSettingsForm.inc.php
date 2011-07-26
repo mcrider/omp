@@ -64,20 +64,20 @@ class NotificationSettingsForm extends PKPNotificationSettingsForm {
 	 * Display the form.
 	 */
 	function display() {
-		$canOnlyRead = true;
+		$canOnlyRead = false;
 		$canOnlyReview = false;
 
 		// FIXME: Bug #6538. These policies used to use several role checks
 		// that are no longer appropriate / have been removed. The remaining
 		// ones should be too.
-		if (Validation::isReviewer()) {
-			$canOnlyRead = false;
-			$canOnlyReview = true;
-		}
-		if (Validation::isSiteAdmin()) {
-			$canOnlyRead = false;
-			$canOnlyReview = false;
-		}
+//		if (Validation::isReviewer()) {
+//			$canOnlyRead = false;
+//			$canOnlyReview = true;
+//		}
+//		if (Validation::isSiteAdmin()) {
+//			$canOnlyRead = false;
+//			$canOnlyReview = false;
+//		}
 
 		$templateMgr =& TemplateManager::getManager();
 		$templateMgr->assign('canOnlyRead', $canOnlyRead);

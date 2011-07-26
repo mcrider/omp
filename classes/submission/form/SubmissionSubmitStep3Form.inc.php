@@ -132,25 +132,36 @@ class SubmissionSubmitStep3Form extends SubmissionSubmitForm {
 		// Save the monograph
 		$monographDao->updateMonograph($monograph);
 
+		//
 		// Send a notification to associated users
-		import('lib.pkp.classes.notification.NotificationManager');
-		$notificationManager = new NotificationManager();
-		$roleDao =& DAORegistry::getDAO('RoleDAO');
-		$notificationUsers = array();
+		//
+
+		$roleDao =& DAORegistry::getDAO('RoleDAO'); /* @var $roleDao RoleDAO */
+
+		// Get the managers and editors.
 		$pressManagers = $roleDao->getUsersByRoleId(ROLE_ID_PRESS_MANAGER);
-		$allUsers = $pressManagers->toArray();
 		$editors = $roleDao->getUsersByRoleId(ROLE_ID_EDITOR);
-		$router =& $request->getRouter();
-		array_merge($allUsers, $editors->toArray());
-		foreach ($allUsers as $user) {
-			$notificationUsers[] = array('id' => $user->getId());
-		}
-		foreach ($notificationUsers as $userRole) {
-			$url = $router->url($request, null, 'workflow', 'submission', $monograph->getId());
-			$notificationManager->createNotification(
-				$userRole['id'], 'notification.type.monographSubmitted',
-				$monograph->getLocalizedTitle(), $url, 1, NOTIFICATION_TYPE_MONOGRAPH_SUBMITTED
-			);
+
+		$pressManagersArray = $pressManagers->toAssociativeArray();
+		$editorsArray = $editors->toAssociativeArray();
+
+		$allUsers = array_unique(array_merge(
+									 array_keys($pressManagersArray),
+									 array_keys($editorsArray)
+								 ));
+
+		$notificationDao =& DAORegistry::getDAO('NotificationDAO');
+		foreach ($allUsers as $userId) {
+			$notification = new Notification();
+			$notification->setUserId($userId);
+			$notification->setType(NOTIFICATION_TYPE_MONOGRAPH_SUBMITTED);
+			$notification->setContextId((int) $monograph->getPressId());
+			$notification->setLevel(NOTIFICATION_LEVEL_NORMAL);
+			$notification->setAssocType(ASSOC_TYPE_MONOGRAPH);
+			$notification->setAssocId((int) $monograph->getId());
+
+			$notificationDao->insertNotification($notification);
+			unset($notification);
 		}
 
 		// Send author notification email
@@ -158,6 +169,7 @@ class SubmissionSubmitStep3Form extends SubmissionSubmitForm {
 		$mail = new MonographMailTemplate($monograph, 'SUBMISSION_ACK', null, null, null, false);
 		$press =& $request->getPress();
 
+		$router =& $request->getRouter();
 		if ($mail->isEnabled()) {
 			$user = $monograph->getUser();
 			$mail->addRecipient($user->getEmail(), $user->getFullName());
