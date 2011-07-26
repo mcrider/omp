@@ -93,9 +93,9 @@ class AdminLanguagesHandler extends AdminHandler {
 
 		$this->_removeLocalesFromPresses($request);
 
-		import('lib.pkp.classes.notification.NotificationManager');
+		import('classes.notification.NotificationManager');
 		$notificationManager = new NotificationManager();
-		$notificationManager->createTrivialNotification('notification.notification', 'common.changesSaved');
+		$notificationManager->createTrivialNotification('common.changesSaved');
 
 		$request->redirect(null, null, 'index');
 	}
@@ -234,9 +234,9 @@ class AdminLanguagesHandler extends AdminHandler {
 			return;
 		}
 
-		import('lib.pkp.classes.notification.NotificationManager');
+		import('classes.notification.NotificationManager');
 		$notificationManager = new NotificationManager();
-		$notificationManager->createTrivialNotification(Locale::translate('notification.notification'), Locale::translate('admin.languages.localeInstalled', array('locale' => $locale)), NOTIFICATION_TYPE_SUCCESS, null, false);
+		$notificationManager->createTrivialNotification(Locale::translate('admin.languages.localeInstalled', array('locale' => $locale)), NOTIFICATION_TYPE_SUCCESS, null, false);
 		$request->redirect(null, null, 'languages');
 	}
 }

@@ -224,7 +224,6 @@ class Monograph extends Submission {
 	 */
 	function getAssociatedUserIdsByUserGroupId($stageId = null, $includeReviewers = false, $includeAuthors = false) {
 		$monographId = $this->getId();
-		$signoffDao =& DAORegistry::getDAO('SignoffDAO');
 
 		$userIds = array();
 
@@ -236,7 +235,6 @@ class Monograph extends Submission {
 		}
 
 		if ( $includeReviewers ) {
-			// FIXME: #6688# reviewers not inluded in stage participants grid
 			// need to add userGroupId's to reviewAssignments.
 			// all this is doing nothing at the moment.
 			$reviewAssignmentDao =& DAORegistry::getDAO('ReviewAssignmentDAO');
