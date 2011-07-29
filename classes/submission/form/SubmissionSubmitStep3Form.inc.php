@@ -150,18 +150,12 @@ class SubmissionSubmitStep3Form extends SubmissionSubmitForm {
 									 array_keys($editorsArray)
 								 ));
 
-		$notificationDao =& DAORegistry::getDAO('NotificationDAO');
+		import('lib.pkp.classes.notification.NotificationManager');
+		$notificationManager = new NotificationManager();
 		foreach ($allUsers as $userId) {
-			$notification = new Notification();
-			$notification->setUserId($userId);
-			$notification->setType(NOTIFICATION_TYPE_MONOGRAPH_SUBMITTED);
-			$notification->setContextId((int) $monograph->getPressId());
-			$notification->setLevel(NOTIFICATION_LEVEL_NORMAL);
-			$notification->setAssocType(ASSOC_TYPE_MONOGRAPH);
-			$notification->setAssocId((int) $monograph->getId());
-
-			$notificationDao->insertNotification($notification);
-			unset($notification);
+			$notificationManager->createNotification($userId, NOTIFICATION_TYPE_MONOGRAPH_SUBMITTED,
+			                                         $monograph->getPressId(), ASSOC_TYPE_MONOGRAPH,
+			                                         $monograph->getId());
 		}
 
 		// Send author notification email

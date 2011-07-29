@@ -17,7 +17,6 @@
 define('NOTIFICATION_TYPE_MONOGRAPH_SUBMITTED', 	0x1000001);
 define('NOTIFICATION_TYPE_METADATA_MODIFIED', 		0x1000002);
 define('NOTIFICATION_TYPE_REVIEWER_COMMENT', 		0x1000003);
-// FIXME: #6792 Removed all the notification types because they were still not used. Bring back as necessary.
 
 import('lib.pkp.classes.notification.PKPNotification');
 
@@ -35,11 +34,14 @@ class Notification extends PKPNotification {
 	 * @return string
 	 */
 	function getUrl($request) {
-		$baseUrl = $request->getBaseUrl();
-		$assocType = $this->getAssocType();
-		switch ($assocType) {
+		$router =& $request->getRouter();
+		$dispatcher =& $router->getDispatcher();
+
+		$type = $this->getType();
+		switch ($type) {
 			case NOTIFICATION_TYPE_MONOGRAPH_SUBMITTED:
 			case NOTIFICATION_TYPE_METADATA_MODIFIED:
+				return $dispatcher->url($request, ROUTE_PAGE, null, 'workflow', 'submission', $this->getAssocId());
 				break;
 			case NOTIFICATION_TYPE_REVIEWER_COMMENT:
 				break;
@@ -49,39 +51,15 @@ class Notification extends PKPNotification {
 	}
 
 	/**
-	 * return the path to the icon for this type
-	 * FIXME: #6792 move these to CSS and in a the template figure out the iconography. Or set a status here or something.
-	 * FIXME: #6792 also remove unused notifications types.
+	 * Return a CSS class containing the icon of this notification type
 	 * @return string
 	 */
-	function getIconLocation() {
-		$baseUrl = Request::getBaseUrl() . '/lib/pkp/templates/images/icons/';
-		switch ($this->getAssocType()) {
-			case NOTIFICATION_TYPE_MONOGRAPH_SUBMITTED:
-				return $baseUrl . 'page_new.gif';
-				break;
-			case NOTIFICATION_TYPE_METADATA_MODIFIED:
-			case NOTIFICATION_TYPE_GALLEY_MODIFIED:
-				return $baseUrl . 'edit.gif';
-				break;
-			case NOTIFICATION_TYPE_SUBMISSION_COMMENT:
-			case NOTIFICATION_TYPE_LAYOUT_COMMENT:
-			case NOTIFICATION_TYPE_COPYEDIT_COMMENT:
-			case NOTIFICATION_TYPE_PROOFREAD_COMMENT:
-			case NOTIFICATION_TYPE_REVIEWER_COMMENT:
-			case NOTIFICATION_TYPE_REVIEWER_FORM_COMMENT:
-			case NOTIFICATION_TYPE_EDITOR_DECISION_COMMENT:
-			case NOTIFICATION_TYPE_USER_COMMENT:
-				return $baseUrl . 'comment_new.gif';
-				break;
-			case NOTIFICATION_TYPE_PUBLISHED_MONOGRAPH:
-				return $baseUrl . 'list_world.gif';
-				break;
-			case NOTIFICATION_TYPE_NEW_ANNOUNCEMENT:
-				return $baseUrl . 'note_new.gif';
-				break;
-			default:
-				return $baseUrl . 'page_alert.gif';
+	function getIconClass() {
+		switch ($this->getType()) {
+			case NOTIFICATION_TYPE_MONOGRAPH_SUBMITTED: return 'notifyIconNewPage'; break;
+			case NOTIFICATION_TYPE_METADATA_MODIFIED: return 'notifyIconEdit'; break;
+			case NOTIFICATION_TYPE_REVIEWER_COMMENT: return 'notifyIconNewComment'; break;
+			default: return parent::getIconClass();
 		}
 	}
 
@@ -129,9 +107,17 @@ class Notification extends PKPNotification {
 				$monograph =& $monographDao->getMonograph($this->getAssocId()); /* @var $monograph Monograph */
 				$title = $monograph->getLocalizedTitle();
 				$this->setTitle($title);
-				$this->setContent(__('notification.type.monographSubmitted'), $title);
+				$this->setContents(__('notification.type.monographSubmitted', array('param' => $title)));
 			case NOTIFICATION_TYPE_REVIEWER_COMMENT:
 				break;
+				assert($this->getAssocType() == ASSOC_TYPE_REVIEW_ASSIGNMENT && is_numeric($this->getAssocId()));
+				$reviewAssignmentDao =& DAORegistry::getDAO('ReviewAssignmentDAO'); /* @var $reviewAssignmentDao ReviewAssignmentDAO */
+				$reviewAssignment =& $reviewAssignmentDao->getById($this->getAssocId());
+				$monographDao =& DAORegistry::getDAO('MonographDAO'); /* @var $monographDao MonographDAO */
+				$monograph =& $monographDao->getMonograph($reviewAssignment->getSubmissionId()); /* @var $monograph Monograph */
+				$title = $monograph->getLocalizedTitle();
+				$this->setTitle($title);
+				$this->setContents(__('notification.type.reviewerComment', array('param' => $title)));
 		}
 	}
 }
