@@ -89,7 +89,7 @@ class AdminPressHandler extends AdminHandler {
 			$settingsForm->execute();
 			import('classes.notification.NotificationManager');
 			$notificationManager = new NotificationManager();
-			$notificationManager->createTrivialNotification('notification.notification', 'common.changesSaved');
+			$notificationManager->createTrivialNotification('common.changesSaved');
 			Request::redirect(null, null, 'presses');
 		} else {
 			$settingsForm->display();

@@ -88,7 +88,7 @@ class PluginHandler extends ManagerHandler {
 			if ($message) {
 				import('classes.notification.NotificationManager');
 				$notificationManager = new NotificationManager();
-				$notificationManager->createTrivialNotification(Locale::translate('notification.notification'), $message, NOTIFICATION_TYPE_SUCCESS, null, 0);
+				$notificationManager->createTrivialNotification($message, NOTIFICATION_TYPE_SUCCESS, null, 0);
 			}
 			$request->redirect(null, null, 'plugins', array($category));
 		}

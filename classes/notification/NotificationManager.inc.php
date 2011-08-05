@@ -84,36 +84,6 @@ class NotificationManager extends PKPNotificationManager {
 		return $contents;
 	}
 
-	/**
-	 * Construct a title for the notification based on its type and associated object
-	 * @param $request PKPRequest
-	 * @param $notification Notification
-	 * @return string
-	 */
-	function getNotificationTitle(&$request, &$notification) {
-		$type = $notification->getType();
-		assert(isset($type));
-
-		switch ($type) {
-			case NOTIFICATION_TYPE_MONOGRAPH_SUBMITTED:
-				assert($notification->getAssocType() == ASSOC_TYPE_MONOGRAPH && is_numeric($notification->getAssocId()));
-				$monographDao =& DAORegistry::getDAO('MonographDAO'); /* @var $monographDao MonographDAO */
-				$monograph =& $monographDao->getMonograph($notification->getAssocId()); /* @var $monograph Monograph */
-				$title = $monograph->getLocalizedTitle();
-			case NOTIFICATION_TYPE_REVIEWER_COMMENT:
-				break;
-				assert($$notification->getAssocType() == ASSOC_TYPE_REVIEW_ASSIGNMENT && is_numeric($notification->getAssocId()));
-				$reviewAssignmentDao =& DAORegistry::getDAO('ReviewAssignmentDAO'); /* @var $reviewAssignmentDao ReviewAssignmentDAO */
-				$reviewAssignment =& $reviewAssignmentDao->getById($notification->getAssocId());
-				$monographDao =& DAORegistry::getDAO('MonographDAO'); /* @var $monographDao MonographDAO */
-				$monograph =& $monographDao->getMonograph($reviewAssignment->getSubmissionId()); /* @var $monograph Monograph */
-				$title = $monograph->getLocalizedTitle();
-			default:
-				$title = parent::getNotificationTitle($request, $notification);
-		}
-
-		return $title;
-	}
 }
 
 ?>

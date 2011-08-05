@@ -135,7 +135,7 @@ class SettingsTabHandler extends Handler {
 				$tabForm->execute($request);
 				import('classes.notification.NotificationManager');
 				$notificationManager = new NotificationManager();
-				$notificationManager->createTrivialNotification('notification.notification', 'common.changesSaved');
+				$notificationManager->createTrivialNotification('common.changesSaved');
 			} else {
 				$json->setStatus(false);
 			}
