@@ -150,7 +150,7 @@ class SubmissionSubmitStep3Form extends SubmissionSubmitForm {
 									 array_keys($editorsArray)
 								 ));
 
-		import('lib.pkp.classes.notification.NotificationManager');
+		import('classes.notification.NotificationManager');
 		$notificationManager = new NotificationManager();
 		foreach ($allUsers as $userId) {
 			$notificationManager->createNotification($userId, NOTIFICATION_TYPE_MONOGRAPH_SUBMITTED,

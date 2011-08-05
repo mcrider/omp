@@ -315,7 +315,7 @@ class UserGridHandler extends GridHandler {
 				} else {
 
 					// Successful edit of an existing user.
-					import('lib.pkp.classes.notification.NotificationManager');
+					import('classes.notification.NotificationManager');
 					$notificationManager = new NotificationManager();
 					$notificationManager->createTrivialNotification('notification.notification', 'common.changesSaved');
 

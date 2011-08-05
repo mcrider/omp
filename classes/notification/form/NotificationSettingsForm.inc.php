@@ -41,31 +41,6 @@ class NotificationSettingsForm extends PKPNotificationSettingsForm {
 	}
 
 	/**
-	 * Display the form.
-	 */
-	function display(&$request) {
-		$canOnlyRead = false;
-		$canOnlyReview = false;
-
-		// FIXME: Bug #6538. These policies used to use several role checks
-		// that are no longer appropriate / have been removed. The remaining
-		// ones should be too.
-//		if (Validation::isReviewer()) {
-//			$canOnlyRead = false;
-//			$canOnlyReview = true;
-//		}
-//		if (Validation::isSiteAdmin()) {
-//			$canOnlyRead = false;
-//			$canOnlyReview = false;
-//		}
-
-		$templateMgr =& TemplateManager::getManager();
-		$templateMgr->assign('canOnlyRead', $canOnlyRead);
-		$templateMgr->assign('canOnlyReview', $canOnlyReview);
-		return parent::display($request);
-	}
-
-	/**
 	 * Save site settings.
 	 */
 	function execute(&$request) {
@@ -77,13 +52,13 @@ class NotificationSettingsForm extends PKPNotificationSettingsForm {
 		$blockedNotifications = array();
 		if(!$this->getData('notificationMonographSubmitted')) $blockedNotifications[] = NOTIFICATION_TYPE_MONOGRAPH_SUBMITTED;
 		if(!$this->getData('notificationMetadataModified')) $blockedNotifications[] = NOTIFICATION_TYPE_METADATA_MODIFIED;
-		if(!$this->getData('notificationReviewerComment')) $blockedNotifications[] = NOTIFICATION_TYPE_METADATA_MODIFIED;
+		if(!$this->getData('notificationReviewerComment')) $blockedNotifications[] = NOTIFICATION_TYPE_REVIEWER_COMMENT;
 
 		// Email settings
 		$emailSettings = array();
 		if($this->getData('emailNotificationMonographSubmitted')) $emailSettings[] = NOTIFICATION_TYPE_MONOGRAPH_SUBMITTED;
 		if($this->getData('emailNotificationMetadataModified')) $emailSettings[] = NOTIFICATION_TYPE_METADATA_MODIFIED;
-		if(!$this->getData('emailNotificationReviewerComment')) $settings[] = NOTIFICATION_TYPE_METADATA_MODIFIED;
+		if($this->getData('emailNotificationReviewerComment')) $emailSettings[] = NOTIFICATION_TYPE_REVIEWER_COMMENT;
 
 
 		$notificationSettingsDao =& DAORegistry::getDAO('NotificationSettingsDAO');

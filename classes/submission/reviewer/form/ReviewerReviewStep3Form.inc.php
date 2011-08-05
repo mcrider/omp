@@ -179,7 +179,7 @@ class ReviewerReviewStep3Form extends ReviewerReviewForm {
 			$stageAssignmentDao =& DAORegistry::getDAO('StageAssignmentDAO');
 			$stageAssignments =& $stageAssignmentDao->getBySubmissionAndStageId($monograph->getId(), $monograph->getStageId());
 
-			import('lib.pkp.classes.notification.NotificationManager');
+			import('classes.notification.NotificationManager');
 			$notificationManager = new NotificationManager();
 			while ($stageAssignment =& $stageAssignments->next()) {
 				$notificationManager->createNotification($stageAssignment->getUserId(), NOTIFICATION_TYPE_REVIEWER_COMMENT,

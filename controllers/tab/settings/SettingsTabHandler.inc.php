@@ -133,7 +133,7 @@ class SettingsTabHandler extends Handler {
 			$tabForm->readInputData($request);
 			if($tabForm->validate()) {
 				$tabForm->execute($request);
-				import('lib.pkp.classes.notification.NotificationManager');
+				import('classes.notification.NotificationManager');
 				$notificationManager = new NotificationManager();
 				$notificationManager->createTrivialNotification('notification.notification', 'common.changesSaved');
 			} else {
