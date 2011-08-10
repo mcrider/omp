@@ -12,34 +12,33 @@
 {include file="common/header.tpl"}
 {/strip}
 
+<script type="text/javascript">
+	$(function() {ldelim}
+		// Attach the form handler.
+		$('#notificationMailList').pkpHandler('$.pkp.controllers.form.FormHandler');
+	{rdelim});
+</script>
+
 <p><span class="instruct">{translate key="notification.unsubscribeDescription"}</span></p>
-<br />
 
-<form class="pkp_form" id="notificationSettings" method="post" action="{url op="unsubscribeMailList"}">
+<form class="pkp_form" id="notificationSettingsForm" method="post" action="{url op="unsubscribeMailList"}">
+	{if $error}
+		<p><span class="pkp_form_error">{translate key="$error"}</span></p>
+	{/if}
 
-{if $error}
-	<p><span class="pkp_form_error">{translate key="$error"}</span></p>
-{/if}
+	{if $success}
+		<p>{translate key="$success"}</p>
+	{/if}
 
-{if $success}
-	<p>{translate key="$success"}</p>
-{/if}
+	{fbvFormArea id="notificationMailList"}
+		{fbvFormSection required="true"}
+			{fbvElement type="text" label="user.email" id="email" size=$fbvStyles.size.MEDIUM} <br />
+			{fbvElement type="text" label="user.password" id="password" size=$fbvStyles.size.MEDIUM}
+		{/fbvFormSection}
+	{/fbvFormArea}
 
-<table class="data" width="100%">
-	<tr valign="top">
-		<td class="label" width="5%">{translate key="email.email"}</td>
-		<td class="value" width="45%"><input type="text" name="email" size="30" maxlength="90" class="textField" /></td>
-	</tr>
-	<tr valign="top">
-		<td class="label" width="5%">{translate key="user.password"}</td>
-		<td class="value" width="45%"><input type="text" name="password" size="30" maxlength="90" class="textField" /></td>
-	</tr>
-	<tr valign="top">
-		<td width="5%">&nbsp;</td>
-		<td><p><input type="submit" value="{translate key="form.submit"}" class="button defaultButton" /></p></td>
-	</tr>
-</table>
-
+	{url|assign:cancelUrl page="notification"}
+	{fbvFormButtons submitText="form.submit" cancelUrl=$cancelUrl}
 </form>
 
 {include file="common/footer.tpl"}
