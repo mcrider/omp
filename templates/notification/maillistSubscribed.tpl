@@ -12,24 +12,21 @@
 {include file="common/header.tpl"}
 {/strip}
 
+<ul>
 {if $status == 'subscribeError'}
-	<ul>
-		<li class="pkp_form"><span class="pkp_form_error">{translate key="notification.subscribeError"}</span></li>
-	<ul>
+	<li class="pkp_form"><span class="pkp_form_error">{translate key="notification.subscribeError"}</span></li>
 {elseif $status == 'subscribeSuccess'}
-	<ul>
-		<li>{translate key="notification.subscribeSuccess"}</li>
-	</ul>
+	<li>{translate key="notification.subscribeSuccess"}</li>
 {elseif $status == 'confirmError'}
-	<ul>
-		<li class="pkp_form"><span class="pkp_form_error">{translate key="notification.confirmError"}</span></li>
-	<ul>
+	<li class="pkp_form"><span class="pkp_form_error">{translate key="notification.confirmError"}</span></li>
 {elseif $status == 'confirmSuccess'}
-	<ul>
-		<li>{translate key="notification.confirmSuccess"}</li>
-	</ul>
+	<li>{translate key="notification.confirmSuccess"}</li>
+{elseif $status == 'unsubscribeSuccess'}
+	<li class="pkp_form"><span class="pkp_form_error">{translate key="notification.unsubscribeSuccess"}</span></li>
+{elseif $status == 'unsubscribeError'}
+	<li class="pkp_form"><span class="pkp_form_error">{translate key="notification.unsubscribeError"}</span></li>
 {/if}
-
+<ul>
 
 {include file="common/footer.tpl"}
 

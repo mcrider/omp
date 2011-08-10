@@ -90,12 +90,12 @@ class AdminPressHandler extends AdminHandler {
 			if ($newPressPath) {
 				Request::redirect($newPressPath, 'management', 'settings', 'wizard');
 			} else {
-				import('lib.pkp.classes.notification.NotificationManager');
+				import('classes.notification.NotificationManager');
 				$notificationManager = new NotificationManager();
-				$notificationManager->createTrivialNotification('notification.notification', 'common.changesSaved');
+				$user =& $request->getUser();
+				$notificationManager->createTrivialNotification($user->getId());
 				Request::redirect(null, null, 'presses');
 			}
-
 		} else {
 			$settingsForm->display();
 		}
