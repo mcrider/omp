@@ -161,6 +161,8 @@
 					{rdelim});
 				</script>
 
+				{** Add empty sidebar to fix layout issues **}
+				<div class="unit size1of5">&nbsp;</div>
 				<div class="pkp_structure_main">
 					<!-- TODO: Place page title here -->
 					<h2 class="title_left">{$pageTitleTranslated}</h2>
