@@ -143,7 +143,7 @@
 		{/fbvFormSection}
 		{if $allowRegReviewer}
 			{fbvFormSection id="reviewerInterestsContainer" label="user.register.reviewerInterests"}
-				{fbvElement type="keyword" id="interests" label="user.interests.description"}
+				{include file="user/interestsInput.tpl"}
 			{/fbvFormSection}
 		{/if}
 	{/if}

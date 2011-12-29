@@ -31,7 +31,7 @@
 	{/fbvFormSection}
 
 	{fbvFormSection title="manager.reviewerSearch.interests"}
-		{fbvElement type="keyword" id="interests" label="user.interests.description"}
+		{include file="user/interestsInput.tpl" interestKeywords=$interestsKeywords interestsTextOnly=$interestsTextOnly}
 	{/fbvFormSection}
 
 	{fbvFormSection title="user.accountInformation"}
